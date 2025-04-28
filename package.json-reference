@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "sonner": "^1.0.0"
+    // ... other dependencies
+  }
+}
