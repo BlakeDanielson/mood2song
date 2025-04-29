@@ -36,6 +36,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<string>("persona")
 
   const [mood, setMood] = useState("")
+  const [displayedMood, setDisplayedMood] = useState("")
   const [excludeMainstream, setExcludeMainstream] = useState(false)
   const [filters, setFilters] = useState({
     genre: "",
@@ -62,6 +63,7 @@ export default function Home() {
     }
 
     console.log("handleFindSongs fetching with:", { currentMood, currentPersonaId, currentFilters })
+    setDisplayedMood(currentMood || "")
     setLoading(true)
     setError(null)
     setSongs([])
@@ -181,10 +183,16 @@ export default function Home() {
             placeholder="How are you feeling right now?"
             value={mood}
             onChange={(e) => setMood(e.target.value)}
-            className="spotify-input pl-10 h-12 rounded-full text-sm w-full"
+            maxLength={250}
+            className="spotify-input pl-10 pr-16 h-12 rounded-full text-sm w-full"
             disabled={loading}
             onKeyDown={(e) => { if (e.key === 'Enter') handleFindSongs(); }}
           />
+          <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+            <span className="text-xs text-muted-foreground">
+              {mood.length}/{250}
+            </span>
+          </div>
         </div>
         <div className="flex items-center space-x-2 flex-shrink-0 self-center sm:self-auto">
           <Switch
@@ -225,7 +233,7 @@ export default function Home() {
             songs={songs}
             loading={loading}
             error={error}
-            mood={mood}
+            mood={displayedMood}
             filters={{...filters, excludeMainstream}}
             selectedPersona={selectedPersona}
             onRefresh={handleRefresh}
