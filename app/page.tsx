@@ -262,7 +262,7 @@ export default function Home() {
       
       {/* Featured Personas Section */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-center text-white">Featured Vibes</h2>
+        <h2 className="text-2xl font-bold text-center text-white">Top Personas</h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {featuredPersonas.map((persona) => (
             <Card
@@ -283,15 +283,15 @@ export default function Home() {
                 </div>
               </CardHeader>
               <CardContent className="p-4 pt-2 space-y-4">
-                <div>
-                  <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Traits</h4>
+                 <div>
+                  <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Key Artists</h4>
                   <div className="flex flex-wrap gap-1">
-                    {persona.traits.map(trait => (
-                       <Badge key={trait} variant="secondary" className="text-[10px] font-normal px-1.5 py-0.5 bg-[#333] text-gray-300 rounded-full whitespace-nowrap">{trait}</Badge>
+                    {persona.artists.map(artist => (
+                       <Badge key={artist} variant="secondary" className="text-[10px] font-normal px-1.5 py-0.5 bg-[#555] text-gray-200 rounded-full whitespace-nowrap">{artist}</Badge>
                     ))}
                   </div>
                 </div>
-                 <div>
+                <div>
                   <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Moods</h4>
                   <div className="flex flex-wrap gap-1">
                     {persona.moods.map(mood => (
@@ -299,11 +299,11 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                 <div>
-                  <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Key Artists</h4>
+                <div>
+                  <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Traits</h4>
                   <div className="flex flex-wrap gap-1">
-                    {persona.artists.map(artist => (
-                       <Badge key={artist} variant="secondary" className="text-[10px] font-normal px-1.5 py-0.5 bg-[#555] text-gray-200 rounded-full whitespace-nowrap">{artist}</Badge>
+                    {persona.traits.map(trait => (
+                       <Badge key={trait} variant="secondary" className="text-[10px] font-normal px-1.5 py-0.5 bg-[#333] text-gray-300 rounded-full whitespace-nowrap">{trait}</Badge>
                     ))}
                   </div>
                 </div>

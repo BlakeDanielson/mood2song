@@ -199,7 +199,7 @@ export function SongRecommendations({
                     <td className="px-2 py-2 text-muted-foreground text-sm text-center align-middle hidden sm:table-cell">
                       {song.year || "-"}
                     </td>
-                    <td className="px-2 py-2 align-middle">
+                    <td className="px-2 py-2 align-middle max-w-xs">
                       <div className="flex items-center gap-3">
                         {song.albumArt ? (
                           <img
@@ -230,7 +230,7 @@ export function SongRecommendations({
                         </div>
                       </div>
                     </td>
-                    <td className="px-2 py-2 align-middle text-sm truncate">
+                    <td className="px-2 py-2 align-middle text-sm truncate max-w-[12rem]">
                       {song.artistSpotifyUrl ? (
                         <a 
                           href={song.artistSpotifyUrl}
@@ -249,7 +249,7 @@ export function SongRecommendations({
                     <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle">
                       {song.reason || "-"}
                     </td>
-                    <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle hidden sm:table-cell">
+                    <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle hidden sm:table-cell max-w-[13rem]">
                       {song.album || "-"}
                     </td>
                   </tr>
