@@ -5,6 +5,8 @@ import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { SonnerProvider } from "@/components/sonner-provider"
 import { Sidebar as AppSidebar } from "@/components/sidebar"
+import { Analytics } from "@vercel/analytics/react"
+
 
 const inter = Inter({ subsets: ["latin"] })
 

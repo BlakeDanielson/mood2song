@@ -1,3 +1,10 @@
+# Content Security Policy Implementation for Next.js
+
+## Updated next.config.mjs
+
+Copy and paste this updated configuration into your `next.config.mjs` file:
+
+```javascript
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -55,9 +62,9 @@ function generateCSP() {
     'font-src': ["'self'", "https://fonts.gstatic.com"],
     'frame-src': ["'self'", "https://open.spotify.com"],
     'connect-src': [
-      "'self'",
-      "https://accounts.spotify.com",
-      "https://api.spotify.com",
+      "'self'", 
+      "https://accounts.spotify.com", 
+      "https://api.spotify.com", 
       "https://api.openai.com"
     ],
     'media-src': ["'self'", "https:", "blob:"],
@@ -72,3 +79,30 @@ function generateCSP() {
 }
 
 export default nextConfig
+```
+
+## Implementation Steps
+
+1. Replace your current `next.config.mjs` with the code above
+2. Restart your Next.js development server
+3. Check the browser console for any CSP violation errors
+4. Adjust the CSP directives as needed based on any violations
+
+## Testing Your CSP
+
+After implementing, test your application thoroughly:
+
+1. Verify all Spotify embeds work correctly
+2. Ensure API calls to Spotify and OpenAI function properly
+3. Check that all styles and scripts load without CSP violations
+
+## Monitoring and Refinement
+
+Consider adding a reporting endpoint to collect CSP violations:
+
+```javascript
+// Add this to your policy object in the generateCSP function
+'report-uri': ['https://your-reporting-endpoint.com/csp-reports']
+```
+
+You can use services like [Report URI](https://report-uri.com/) or set up your own endpoint to collect these reports.
