@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import type {
   SongData
 } from "@/app/actions"
-import { ExternalLink, Info, Music2, Play, RefreshCw } from "lucide-react"
+import { ExternalLink, Info, Music2, Play, RefreshCw, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { personas, Persona } from "@/lib/personas"
 
@@ -151,26 +151,37 @@ export function SongRecommendations({
               )}
             </div>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleManualRefresh}
-              className="text-muted-foreground hover:text-white hover:bg-[#333333] self-end sm:self-auto"
-              title="Refresh Recommendations"
-            >
-              <RefreshCw className="h-4 w-4 mr-2" /> Refresh Suggestions
-            </Button>
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleManualRefresh}
+                className="text-muted-foreground hover:text-white hover:bg-[#333333]"
+                title="Refresh Recommendations"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" /> Refresh Suggestions
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => window.location.href = '/'}
+                className="text-muted-foreground hover:text-white hover:bg-[#333333]"
+                title="Clear Playlist and Reset"
+              >
+                <XCircle className="h-4 w-4 mr-2" /> Clear Playlist
+              </Button>
+            </div>
           </div>
 
           <table className="w-full table-auto border-collapse text-sm mt-2">
             <thead>
               <tr className="border-b border-[#333333]">
                 <th className="px-2 py-2 text-center font-medium text-muted-foreground w-2">#</th>
+                <th className="px-2 py-2 text-center font-medium text-muted-foreground w-auto hidden sm:table-cell">YEAR</th>
                 <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">TITLE</th>
                 <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">ARTIST</th>
                 <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">REASON</th>
                 <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto hidden sm:table-cell">ALBUM</th>
-                <th className="px-2 py-2 text-center font-medium text-muted-foreground w-auto hidden sm:table-cell">YEAR</th>
               </tr>
             </thead>
             <tbody>
@@ -184,6 +195,9 @@ export function SongRecommendations({
                     <td className="px-2 py-2 text-center text-muted-foreground align-middle">
                       <span className="group-hover:hidden w-4 inline-block text-center">{index + 1}</span>
                       <Play className="h-4 w-4 hidden group-hover:inline-block text-white" />
+                    </td>
+                    <td className="px-2 py-2 text-muted-foreground text-sm text-center align-middle hidden sm:table-cell">
+                      {song.year || "-"}
                     </td>
                     <td className="px-2 py-2 align-middle">
                       <div className="flex items-center gap-3">
@@ -237,9 +251,6 @@ export function SongRecommendations({
                     </td>
                     <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle hidden sm:table-cell">
                       {song.album || "-"}
-                    </td>
-                    <td className="px-2 py-2 text-muted-foreground text-sm text-center align-middle hidden sm:table-cell">
-                      {song.year || "-"}
                     </td>
                   </tr>
                   {expandedSong === (song.spotifyId || `${song.title}-${index}`) && (

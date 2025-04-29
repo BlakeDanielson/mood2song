@@ -10,7 +10,7 @@ import { toast } from "sonner"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Laptop, Truck, Guitar, Music, Info } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
@@ -35,6 +35,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [lastFetchParams, setLastFetchParams] = useState<{ mood?: string, filters: any, personaId?: string | null } | null>(null)
   const [searchPerformed, setSearchPerformed] = useState(false)
+  const [showAllPersonas, setShowAllPersonas] = useState(false); // State to control visibility
 
   const [mood, setMood] = useState("")
   const [displayedMood, setDisplayedMood] = useState("")
@@ -185,24 +186,21 @@ export default function Home() {
 
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
         <div className="relative flex-grow">
-          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-muted-foreground" />
-          </div>
-          <Input
+          <Textarea
             id="mood-input"
-            placeholder="How are you feeling right now? (Optional if selecting a persona)"
+            placeholder={"Describe your mood, activity or anything else! (e.g., 'Chill beats for a rainy afternoon', 'Upbeat running mix', 'Cooking dinner soundtrack', 'Help me roast my friend Scott')\nSet filters, or select a persona below!\nPress Enter to find songs or Shift+Enter to add a new line"}
             value={mood}
             onChange={(e) => setMood(e.target.value)}
             maxLength={250}
-            className="spotify-input pl-10 pr-16 h-12 rounded-full text-sm w-full"
+            className="spotify-input pl-3 pr-3 py-3 h-24 rounded-lg text-sm w-full resize-none"
             disabled={loading}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleFindSongs(); }}
+            onKeyDown={(e) => { 
+              if (e.key === 'Enter' && !e.shiftKey) { 
+                e.preventDefault();
+                handleFindSongs(); 
+              }
+            }}
           />
-          <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-            <span className="text-xs text-muted-foreground">
-              {mood.length}/{250}
-            </span>
-          </div>
         </div>
         <div className="flex items-center space-x-2 flex-shrink-0 self-center sm:self-auto">
           <Switch
@@ -313,50 +311,62 @@ export default function Home() {
             </Card>
           ))}
         </div>
+        {/* Button to toggle all personas */}
+        <div className="text-center mt-6">
+          <Button
+            variant="outline"
+            onClick={() => setShowAllPersonas(!showAllPersonas)} // Toggle state
+            className="spotify-outline-button"
+          >
+            {showAllPersonas ? "Hide Personas" : "See All Personas"} {/* Dynamic text */}
+          </Button>
+        </div>
       </div>
       
-      {/* Persona Grid - Now uses otherPersonas */}
-      <div className="pt-6 border-t border-[#282828]">
-        <h2 className="text-2xl font-bold mb-4 text-center text-white">Choose a Persona Vibe</h2>
-         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {otherPersonas.map((persona) => (
-              <Card
-                key={persona.id}
-                className={`cursor-pointer transition-all duration-200 ease-in-out bg-[#181818] border-[#282828] text-white hover:bg-[#282828] flex flex-col justify-between ${selectedPersonaId === persona.id ? 'ring-2 ring-green-500' : ''}`}
-                onClick={() => handlePersonaSelect(persona.id)}
-              >
-                <CardHeader className="p-3 space-y-1.5">
-                  <div className="flex flex-row items-center gap-3">
-                    {getPersonaIcon(persona.name)}
-                    <CardTitle className="text-sm font-bold">{persona.name}</CardTitle>
-                  </div>
-                  <CardDescription className="text-xs text-muted-foreground leading-tight line-clamp-2">
-                    {persona.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-3 pt-1 flex items-center justify-between">
-                  <div className="flex flex-wrap gap-1 flex-grow mr-2">
-                    {persona.artists.slice(0, 3).map(artist => (
-                      <Badge key={artist} variant="secondary" className="text-[10px] font-normal px-1.5 py-0.5 bg-[#333] text-gray-300 rounded-full whitespace-nowrap">{artist}</Badge>
-                    ))}
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-xs text-muted-foreground hover:text-white hover:bg-[#282828] px-1.5 py-0.5 h-auto flex-shrink-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenPersonaModal(persona);
-                    }}
-                    title={`More info about ${persona.name}`}
-                  >
-                    <Info className="h-3 w-3 mr-1" /> Info
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+      {/* Persona Grid - Conditionally rendered */}
+      {showAllPersonas && (
+        <div className="pt-6 border-t border-[#282828]">
+          <h2 className="text-2xl font-bold mb-4 text-center text-white">Choose a Persona Vibe</h2>
+           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {otherPersonas.map((persona) => (
+                <Card
+                  key={persona.id}
+                  className={`cursor-pointer transition-all duration-200 ease-in-out bg-[#181818] border-[#282828] text-white hover:bg-[#282828] flex flex-col justify-between ${selectedPersonaId === persona.id ? 'ring-2 ring-green-500' : ''}`}
+                  onClick={() => handlePersonaSelect(persona.id)}
+                >
+                  <CardHeader className="p-3 space-y-1.5">
+                    <div className="flex flex-row items-center gap-3">
+                      {getPersonaIcon(persona.name)}
+                      <CardTitle className="text-sm font-bold">{persona.name}</CardTitle>
+                    </div>
+                    <CardDescription className="text-xs text-muted-foreground leading-tight line-clamp-2">
+                      {persona.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-3 pt-1 flex items-center justify-between">
+                    <div className="flex flex-wrap gap-1 flex-grow mr-2">
+                      {persona.artists.slice(0, 3).map(artist => (
+                        <Badge key={artist} variant="secondary" className="text-[10px] font-normal px-1.5 py-0.5 bg-[#333] text-gray-300 rounded-full whitespace-nowrap">{artist}</Badge>
+                      ))}
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-xs text-muted-foreground hover:text-white hover:bg-[#282828] px-1.5 py-0.5 h-auto flex-shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenPersonaModal(persona);
+                      }}
+                      title={`More info about ${persona.name}`}
+                    >
+                      <Info className="h-3 w-3 mr-1" /> Info
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
+      )}
 
       <PersonaModal 
         persona={selectedPersonaForModal} 

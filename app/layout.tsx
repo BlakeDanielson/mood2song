@@ -26,10 +26,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <div className="flex min-h-screen">
-            <div className="w-64 border-r dark:border-neutral-800 p-4 flex-shrink-0 hidden md:block">
+            <div className="fixed h-screen w-64 border-r dark:border-neutral-800 p-4 flex-shrink-0 hidden md:block">
               <AppSidebar />
             </div>
-            <main className="flex-1 overflow-auto px-10">
+            <main className="flex-1 overflow-y-auto pl-72 pr-10">
               {children}
             </main>
           </div>
