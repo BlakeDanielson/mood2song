@@ -167,6 +167,7 @@ export function SongRecommendations({
               <tr className="border-b border-[#333333]">
                 <th className="px-2 py-2 text-center font-medium text-muted-foreground w-2">#</th>
                 <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">TITLE</th>
+                <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">ARTIST</th>
                 <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">REASON</th>
                 <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto hidden sm:table-cell">ALBUM</th>
                 <th className="px-2 py-2 text-center font-medium text-muted-foreground w-auto hidden sm:table-cell">YEAR</th>
@@ -212,22 +213,24 @@ export function SongRecommendations({
                           ) : (
                             <div className="text-white font-medium truncate">{song.title}</div>
                           )}
-                          {song.artistSpotifyUrl ? (
-                            <a 
-                              href={song.artistSpotifyUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block text-muted-foreground text-sm truncate group-hover:underline hover:text-[#1DB954]"
-                              title={`View ${song.artist} on Spotify`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {song.artist}
-                            </a>
-                          ) : (
-                             <div className="block text-muted-foreground text-sm truncate">{song.artist}</div>
-                          )}
                         </div>
                       </div>
+                    </td>
+                    <td className="px-2 py-2 align-middle text-sm truncate">
+                      {song.artistSpotifyUrl ? (
+                        <a 
+                          href={song.artistSpotifyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-muted-foreground group-hover:text-white group-hover:underline hover:!text-[#1DB954]"
+                          title={`View ${song.artist} on Spotify`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {song.artist}
+                        </a>
+                      ) : (
+                         <div className="text-muted-foreground">{song.artist}</div>
+                      )}
                     </td>
                     <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle">
                       {song.reason || "-"}
@@ -241,13 +244,7 @@ export function SongRecommendations({
                   </tr>
                   {expandedSong === (song.spotifyId || `${song.title}-${index}`) && (
                     <tr className="bg-[#282828]">
-                      <td colSpan={3} className="sm:colSpan={5} p-4">
-                        {song.reason && (
-                          <div className="flex items-start mb-3 text-sm text-muted-foreground">
-                            <Info className="h-4 w-4 mr-2 mt-0.5 text-[#1DB954] flex-shrink-0" />
-                            <p>{song.reason}</p>
-                          </div>
-                        )}
+                      <td colSpan={6} className="p-4">
                         {song.embedUrl && (
                           <div className="mt-2">
                             <iframe
@@ -271,18 +268,6 @@ export function SongRecommendations({
                             <ExternalLink className="h-4 w-4 mr-1" /> Open in Spotify
                           </a>
                         )}
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          {song.genre && (
-                            <Badge variant="outline" className="bg-[#333333] text-white border-[#444444] text-xs">
-                              {song.genre}
-                            </Badge>
-                          )}
-                          {getPopularityLabel(song.popularity)?.label && (
-                            <Badge className={`bg-[#333333] text-white border-[#444444] text-xs`}>
-                              {getPopularityLabel(song.popularity)?.label}
-                            </Badge>
-                          )}
-                        </div>
                       </td>
                     </tr>
                   )}
