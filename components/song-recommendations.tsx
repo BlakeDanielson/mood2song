@@ -173,119 +173,124 @@ export function SongRecommendations({
             </div>
           </div>
 
-          <table className="w-full table-auto border-collapse text-sm mt-2">
-            <thead>
-              <tr className="border-b border-[#333333]">
-                <th className="px-2 py-2 text-center font-medium text-muted-foreground w-2">#</th>
-                <th className="px-2 py-2 text-center font-medium text-muted-foreground w-auto hidden sm:table-cell">YEAR</th>
-                <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">TITLE</th>
-                <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">ARTIST</th>
-                <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">REASON</th>
-                <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto hidden sm:table-cell">ALBUM</th>
-              </tr>
-            </thead>
-            <tbody>
-              {songs.map((song, index) => (
-                <>
-                  <tr 
-                    key={`${song.title}-${song.artist}-${index}`} 
-                    className="group border-b border-[#282828] hover:bg-[#282828] cursor-pointer"
-                    onClick={() => toggleExpandSong(song.spotifyId || `${song.title}-${index}`)}
-                  >
-                    <td className="px-2 py-2 text-center text-muted-foreground align-middle">
-                      <span className="group-hover:hidden w-4 inline-block text-center">{index + 1}</span>
-                      <Play className="h-4 w-4 hidden group-hover:inline-block text-white" />
-                    </td>
-                    <td className="px-2 py-2 text-muted-foreground text-sm text-center align-middle hidden sm:table-cell">
-                      {song.year || "-"}
-                    </td>
-                    <td className="px-2 py-2 align-middle max-w-xs">
-                      <div className="flex items-center gap-3">
-                        {song.albumArt ? (
-                          <img
-                            src={song.albumArt || "/placeholder.svg"}
-                            alt={`${song.title} album art`}
-                            className="w-10 h-10 object-cover rounded-sm flex-shrink-0"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 bg-[#333333] flex items-center justify-center rounded-sm flex-shrink-0">
-                            <Music2 className="h-5 w-5 text-muted-foreground" />
+          {/* Add horizontal scroll wrapper for the table on small screens */}
+          <div className="overflow-x-auto">
+            <table className="w-full table-auto border-collapse text-sm mt-2 min-w-[600px] sm:min-w-full"> {/* Added min-width for scroll activation */}
+              <thead>
+                <tr className="border-b border-[#333333]">
+                  <th className="px-2 py-2 text-center font-medium text-muted-foreground w-2">#</th>
+                  <th className="px-2 py-2 text-center font-medium text-muted-foreground w-auto hidden sm:table-cell">YEAR</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">TITLE</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">ARTIST</th>
+                  {/* Hide REASON column on small screens */}
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto hidden sm:table-cell">REASON</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto hidden sm:table-cell">ALBUM</th>
+                </tr>
+              </thead>
+              <tbody>
+                {songs.map((song, index) => (
+                  <>
+                    <tr 
+                      key={`${song.title}-${song.artist}-${index}`} 
+                      className="group border-b border-[#282828] hover:bg-[#282828] cursor-pointer"
+                      onClick={() => toggleExpandSong(song.spotifyId || `${song.title}-${index}`)}
+                    >
+                      <td className="px-2 py-2 text-center text-muted-foreground align-middle">
+                        <span className="group-hover:hidden w-4 inline-block text-center">{index + 1}</span>
+                        <Play className="h-4 w-4 hidden group-hover:inline-block text-white" />
+                      </td>
+                      <td className="px-2 py-2 text-muted-foreground text-sm text-center align-middle hidden sm:table-cell">
+                        {song.year || "-"}
+                      </td>
+                      <td className="px-2 py-2 align-middle max-w-xs">
+                        <div className="flex items-center gap-3">
+                          {song.albumArt ? (
+                            <img
+                              src={song.albumArt || "/placeholder.svg"}
+                              alt={`${song.title} album art`}
+                              className="w-10 h-10 object-cover rounded-sm flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-[#333333] flex items-center justify-center rounded-sm flex-shrink-0">
+                              <Music2 className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            {song.spotifyUrl ? (
+                              <a 
+                                href={song.spotifyUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-white font-medium truncate group-hover:underline hover:text-[#1DB954] inline-block"
+                                title={`Listen to ${song.title} on Spotify`}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {song.title}
+                              </a>
+                            ) : (
+                              <div className="text-white font-medium truncate">{song.title}</div>
+                            )}
                           </div>
+                        </div>
+                      </td>
+                      <td className="px-2 py-2 align-middle text-sm truncate max-w-[12rem]">
+                        {song.artistSpotifyUrl ? (
+                          <a 
+                            href={song.artistSpotifyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-muted-foreground group-hover:text-white group-hover:underline hover:!text-[#1DB954]"
+                            title={`View ${song.artist} on Spotify`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {song.artist}
+                          </a>
+                        ) : (
+                           <div className="text-muted-foreground">{song.artist}</div>
                         )}
-                        <div className="min-w-0">
-                          {song.spotifyUrl ? (
-                            <a 
+                      </td>
+                      {/* Hide REASON column data on small screens */}
+                      <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle hidden sm:table-cell">
+                        {song.reason || "-"}
+                      </td>
+                      <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle hidden sm:table-cell max-w-[13rem]">
+                        {song.album || "-"}
+                      </td>
+                    </tr>
+                    {expandedSong === (song.spotifyId || `${song.title}-${index}`) && (
+                      <tr className="bg-[#282828]">
+                        <td colSpan={6} className="p-4">
+                          {song.embedUrl && (
+                            <div className="mt-2">
+                              <iframe
+                                src={song.embedUrl}
+                                width="100%"
+                                height="80"
+                                frameBorder="0"
+                                allow="encrypted-media"
+                                title={`${song.title} by ${song.artist}`}
+                                className="rounded"
+                              ></iframe>
+                            </div>
+                          )}
+                          {!song.embedUrl && song.spotifyUrl && (
+                            <a
                               href={song.spotifyUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-white font-medium truncate group-hover:underline hover:text-[#1DB954] inline-block"
-                              title={`Listen to ${song.title} on Spotify`}
-                              onClick={(e) => e.stopPropagation()}
+                              className="text-xs flex items-center text-[#1DB954] hover:text-[#1ed760] mt-2"
                             >
-                              {song.title}
+                              <ExternalLink className="h-4 w-4 mr-1" /> Open in Spotify
                             </a>
-                          ) : (
-                            <div className="text-white font-medium truncate">{song.title}</div>
                           )}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-2 py-2 align-middle text-sm truncate max-w-[12rem]">
-                      {song.artistSpotifyUrl ? (
-                        <a 
-                          href={song.artistSpotifyUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-muted-foreground group-hover:text-white group-hover:underline hover:!text-[#1DB954]"
-                          title={`View ${song.artist} on Spotify`}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {song.artist}
-                        </a>
-                      ) : (
-                         <div className="text-muted-foreground">{song.artist}</div>
-                      )}
-                    </td>
-                    <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle">
-                      {song.reason || "-"}
-                    </td>
-                    <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle hidden sm:table-cell max-w-[13rem]">
-                      {song.album || "-"}
-                    </td>
-                  </tr>
-                  {expandedSong === (song.spotifyId || `${song.title}-${index}`) && (
-                    <tr className="bg-[#282828]">
-                      <td colSpan={6} className="p-4">
-                        {song.embedUrl && (
-                          <div className="mt-2">
-                            <iframe
-                              src={song.embedUrl}
-                              width="100%"
-                              height="80"
-                              frameBorder="0"
-                              allow="encrypted-media"
-                              title={`${song.title} by ${song.artist}`}
-                              className="rounded"
-                            ></iframe>
-                          </div>
-                        )}
-                        {!song.embedUrl && song.spotifyUrl && (
-                          <a
-                            href={song.spotifyUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs flex items-center text-[#1DB954] hover:text-[#1ed760] mt-2"
-                          >
-                            <ExternalLink className="h-4 w-4 mr-1" /> Open in Spotify
-                          </a>
-                        )}
-                      </td>
-                    </tr>
-                  )}
-                </>
-              ))}
-            </tbody>
-          </table>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                ))}
+              </tbody>
+            </table>
+          </div> { /* Close scroll wrapper */}
         </>
       )}
     </div>
