@@ -253,7 +253,7 @@ export function SongRecommendations({
                       <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle hidden sm:table-cell">
                         {song.reason || "-"}
                       </td>
-                      <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle hidden sm:table-cell max-w-[13rem]">
+                      <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle hidden sm:table-cell max-w-[12rem]">
                         {song.album || "-"}
                       </td>
                     </tr>

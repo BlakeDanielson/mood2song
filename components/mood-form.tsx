@@ -51,7 +51,10 @@ export function MoodForm({
 
   return (
     <div className="space-y-6">
-      <MoodPresets onSelectMood={onSelectMood} currentMood={currentMood} disabled={isLoading} />
+      {/* Hide MoodPresets on small screens (mobile) */}
+      <div className="hidden sm:block">
+        <MoodPresets onSelectMood={onSelectMood} currentMood={currentMood} disabled={isLoading} />
+      </div>
       <MoodFilters filters={filters} onFilterChange={onFilterChange} disabled={isLoading} />
     </div>
   )
