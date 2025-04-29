@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button"
 interface MoodPresetsProps {
   onSelectMood: (mood: string) => void
   currentMood: string
+  disabled?: boolean
 }
 
-export function MoodPresets({ onSelectMood, currentMood }: MoodPresetsProps) {
+export function MoodPresets({ onSelectMood, currentMood, disabled }: MoodPresetsProps) {
   const moodPresets = [
     { name: "Melancholic", color: "bg-blue-900" },
     { name: "Energetic", color: "bg-orange-900" },
@@ -38,6 +39,7 @@ export function MoodPresets({ onSelectMood, currentMood }: MoodPresetsProps) {
               currentMood === preset.name ? 'ring-2 ring-green-500 ring-offset-2 ring-offset-[#121212]' : ''
             }`}
             variant="ghost"
+            disabled={disabled}
           >
             {preset.name}
           </Button>

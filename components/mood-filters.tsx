@@ -5,27 +5,28 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface MoodFiltersProps {
+  filters: {
+    genre: string
+    era: string
+    popularity: string
+    language: string
+  }
   onFilterChange: (filters: {
     genre?: string
     era?: string
     popularity?: string
     language?: string
   }) => void
+  disabled?: boolean
 }
 
 export function MoodFilters({
-  onFilterChange
+  filters,
+  onFilterChange,
+  disabled
 }: MoodFiltersProps) {
-  const [filters, setFilters] = useState({
-    genre: "",
-    era: "",
-    popularity: "",
-    language: "",
-  })
-
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     const newFilters = { ...filters, [key]: value }
-    setFilters(newFilters)
     onFilterChange(newFilters)
   }
 
@@ -36,10 +37,14 @@ export function MoodFilters({
           <Label htmlFor="genre" className="text-sm text-muted-foreground">
             Genre
           </Label>
-          <Select value={filters.genre} onValueChange={(value) => handleFilterChange("genre", value)}>
+          <Select 
+            value={filters.genre || "any"}
+            onValueChange={(value) => handleFilterChange("genre", value)}
+            disabled={disabled}
+          >
             <SelectTrigger 
               id="genre" 
-              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050]"
+              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <SelectValue placeholder="Any genre" />
             </SelectTrigger>
@@ -65,10 +70,14 @@ export function MoodFilters({
           <Label htmlFor="era" className="text-sm text-muted-foreground">
             Era
           </Label>
-          <Select value={filters.era} onValueChange={(value) => handleFilterChange("era", value)}>
+          <Select 
+            value={filters.era || "any"}
+            onValueChange={(value) => handleFilterChange("era", value)}
+            disabled={disabled}
+          >
             <SelectTrigger 
               id="era" 
-              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050]"
+              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <SelectValue placeholder="Any era" />
             </SelectTrigger>
@@ -90,10 +99,14 @@ export function MoodFilters({
           <Label htmlFor="popularity" className="text-sm text-muted-foreground">
             Discovery Level
           </Label>
-          <Select value={filters.popularity} onValueChange={(value) => handleFilterChange("popularity", value)}>
+          <Select 
+            value={filters.popularity || "any"}
+            onValueChange={(value) => handleFilterChange("popularity", value)}
+            disabled={disabled}
+          >
             <SelectTrigger 
               id="popularity" 
-              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050]"
+              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <SelectValue placeholder="Any popularity" />
             </SelectTrigger>
@@ -110,10 +123,14 @@ export function MoodFilters({
           <Label htmlFor="language" className="text-sm text-muted-foreground">
             Language
           </Label>
-          <Select value={filters.language} onValueChange={(value) => handleFilterChange("language", value)}>
+          <Select 
+            value={filters.language || "any"}
+            onValueChange={(value) => handleFilterChange("language", value)}
+            disabled={disabled}
+          >
             <SelectTrigger 
               id="language" 
-              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050]"
+              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <SelectValue placeholder="Any language" />
             </SelectTrigger>

@@ -7,15 +7,16 @@ import { personas, Persona } from "@/lib/personas"
 import { findSongs } from "@/app/actions"
 import type { SongData, FindSongsSuccessResponse } from "@/app/actions"
 import { toast } from "sonner"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Laptop, Truck, Guitar, Music } from 'lucide-react'
+import { Laptop, Truck, Guitar, Music, Info } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Loader2, Sparkles, Search } from "lucide-react"
+import { PersonaModal } from "@/components/persona-modal"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 // Helper to get an icon based on persona name (replace with better logic if needed)
 const getPersonaIcon = (personaName: string): JSX.Element => {
@@ -28,12 +29,12 @@ const getPersonaIcon = (personaName: string): JSX.Element => {
 
 export default function Home() {
   const [selectedPersonaId, setSelectedPersonaId] = useState<string | null>(null)
+  const [selectedPersonaForModal, setSelectedPersonaForModal] = useState<Persona | null>(null)
   const [songs, setSongs] = useState<SongData[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastFetchParams, setLastFetchParams] = useState<{ mood?: string, filters: any, personaId?: string | null } | null>(null)
   const [searchPerformed, setSearchPerformed] = useState(false)
-  const [activeTab, setActiveTab] = useState<string>("persona")
 
   const [mood, setMood] = useState("")
   const [displayedMood, setDisplayedMood] = useState("")
@@ -45,20 +46,15 @@ export default function Home() {
     language: "",
   })
 
-  const handleFindSongs = useCallback(async (personaIdToFetch?: string | null) => {
+  const handleFindSongs = useCallback(async () => {
     const currentMood = mood.trim() || undefined;
     const currentFilters = { ...filters, excludeMainstream };
-    const currentPersonaId = personaIdToFetch !== undefined ? personaIdToFetch : selectedPersonaId;
+    const currentPersonaId = selectedPersonaId;
 
-    if (personaIdToFetch === undefined && !currentMood && Object.values(filters).every(f => !f) && !currentPersonaId) {
+    if (!currentMood && !currentPersonaId) {
       toast.info("Input needed", {
-        description: "Please enter a mood, select filters, or choose a persona.",
+        description: "Please enter a mood or select a persona.",
       })
-      return;
-    }
-
-    if (personaIdToFetch !== undefined && !currentPersonaId) {
-      console.warn("handleFindSongs called via persona selection, but personaId is null/undefined.");
       return;
     }
 
@@ -107,36 +103,36 @@ export default function Home() {
     }
   }, [mood, filters, excludeMainstream, selectedPersonaId])
 
-  // New wrapper function for the button click
   const handleButtonClick = () => {
-    handleFindSongs(); // Call without arguments, it will use the state `selectedPersonaId`
+    handleFindSongs();
   };
 
   const handlePersonaSelect = (id: string | null) => {
     const isDeselecting = selectedPersonaId === id;
     
     if (isDeselecting) {
-      // If clicking the already selected persona, deselect it
       setSelectedPersonaId(null);
-      setSongs([]); // Clear results when deselecting
+      setSongs([]);
       setError(null);
       setSearchPerformed(false); 
       console.log("Persona deselected.");
     } else {
-       // If selecting a new or different persona
       setSelectedPersonaId(id);
-      // Don't fetch songs automatically anymore
-      // We might still want to clear previous results if the user *changes* persona
-      // Let's clear results unless the user is just selecting the first persona
-      if (selectedPersonaId !== null) { // Clear if *changing* from one persona to another
+      if (selectedPersonaId !== null) { 
           setSongs([]);
           setError(null);
           setSearchPerformed(false); 
       }
       console.log("Persona selected:", id);
     }
-    
-    // Note: No call to handleFindSongs(id) here anymore
+  };
+
+  const handleOpenPersonaModal = (persona: Persona) => {
+    setSelectedPersonaForModal(persona);
+  };
+
+  const handleClosePersonaModal = () => {
+    setSelectedPersonaForModal(null);
   };
 
   const handleFilterChange = (newFilters: {
@@ -169,18 +165,32 @@ export default function Home() {
 
   const selectedPersona = personas.find(p => p.id === selectedPersonaId) || null
 
-  const showRecommendationsFirst = searchPerformed && !loading && !error && songs.length > 0;
+  // Define Top Persona IDs and filter lists
+  const topPersonaIds = [
+    'persona-1-alt-experimental',
+    'persona-2-modern-country',
+    'persona-3a-rock-purist'
+  ];
+  const featuredPersonas = personas.filter(p => topPersonaIds.includes(p.id));
+  const otherPersonas = personas.filter(p => !topPersonaIds.includes(p.id));
 
   return (
-    <div className="mx-auto px-4 md:px-8 py-4">
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-6">
+    <div className="mx-auto py-4 space-y-10">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-[#1ED760] to-[#1DB954] bg-clip-text text-transparent">
+          Discover Music by Mood, Persona, or Both
+        </h1>
+        <p className="text-muted-foreground">Tell us how you're feeling, apply filters, or pick a persona vibe below.</p>
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
         <div className="relative flex-grow">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-muted-foreground" />
           </div>
           <Input
             id="mood-input"
-            placeholder="How are you feeling right now?"
+            placeholder="How are you feeling right now? (Optional if selecting a persona)"
             value={mood}
             onChange={(e) => setMood(e.target.value)}
             maxLength={250}
@@ -209,7 +219,7 @@ export default function Home() {
         <Button
           type="button"
           onClick={handleButtonClick}
-          disabled={loading}
+          disabled={loading || (!mood && !selectedPersonaId)}
           className="spotify-button rounded-full px-16 py-3 h-12 flex-shrink-0 w-full sm:w-auto"
         >
           {loading ? (
@@ -242,58 +252,119 @@ export default function Home() {
         </div>
       )}
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4 bg-[#121212] p-0 h-12">
-          <TabsTrigger 
-            value="mood" 
-            className={`py-3 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-[#282828] data-[state=active]:text-white data-[state=inactive]:text-muted-foreground data-[state=active]:shadow-none rounded-tl-md rounded-bl-md rounded-tr-none rounded-br-none border-b-4 ${activeTab === 'mood' ? 'border-green-500' : 'border-transparent'}`}
-          >
-            Select Mood
-          </TabsTrigger>
-          <TabsTrigger 
-            value="persona" 
-            className={`py-3 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-[#282828] data-[state=active]:text-white data-[state=inactive]:text-muted-foreground data-[state=active]:shadow-none rounded-tr-md rounded-br-md rounded-tl-none rounded-bl-none border-b-4 ${activeTab === 'persona' ? 'border-green-500' : 'border-transparent'}`}
-          >
-            {selectedPersona ? selectedPersona.name : 'Choose Persona'}
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="mood">
-          <MoodForm
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onSelectMood={handleSelectMood}
-            isLoading={loading}
-            currentMood={mood}
-          />
-        </TabsContent>
-        <TabsContent value="persona">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {personas.map((persona) => (
-              <Card 
-                key={persona.id} 
-                className={`cursor-pointer transition-all duration-200 ease-in-out bg-[#181818] border-[#282828] text-white hover:bg-[#282828] ${selectedPersonaId === persona.id ? 'ring-2 ring-green-500' : ''}`}
+      {/* Mood Form Content (Presets & Filters) - No longer in a Tab */}
+      <MoodForm
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onSelectMood={handleSelectMood}
+        isLoading={loading}
+        currentMood={mood}
+        // Removed onSelectPersonaAndSwitchTab prop
+      />
+      
+      {/* Featured Personas Section */}
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold text-center text-white">Featured Vibes</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {featuredPersonas.map((persona) => (
+            <Card
+              key={persona.id}
+              className={`cursor-pointer transition-all duration-200 ease-in-out bg-[#181818] border-[#282828] text-white hover:bg-[#282828] flex flex-col ${selectedPersonaId === persona.id ? 'ring-2 ring-green-500' : ''}`}
+              onClick={() => handlePersonaSelect(persona.id)}
+            >
+              <CardHeader className="flex flex-row items-center gap-4 p-4">
+                <Avatar className="h-16 w-16 border-2 border-green-500">
+                  <AvatarImage src={persona.imageUrl} alt={`${persona.name} avatar`} />
+                  <AvatarFallback className="bg-[#333]">{persona.name.substring(0, 2)}</AvatarFallback>
+                </Avatar>
+                <div className="space-y-1">
+                  <CardTitle className="text-lg font-bold">{persona.name}</CardTitle>
+                  <CardDescription className="text-sm text-muted-foreground leading-snug">
+                    "{persona.description}"
+                  </CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 pt-2 space-y-4">
+                <div>
+                  <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Traits</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {persona.traits.map(trait => (
+                       <Badge key={trait} variant="secondary" className="text-[10px] font-normal px-1.5 py-0.5 bg-[#333] text-gray-300 rounded-full whitespace-nowrap">{trait}</Badge>
+                    ))}
+                  </div>
+                </div>
+                 <div>
+                  <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Moods</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {persona.moods.map(mood => (
+                       <Badge key={mood} variant="outline" className="text-[10px] font-normal px-1.5 py-0.5 border-green-500 text-green-400 rounded-full whitespace-nowrap">{mood}</Badge>
+                    ))}
+                  </div>
+                </div>
+                 <div>
+                  <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Key Artists</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {persona.artists.map(artist => (
+                       <Badge key={artist} variant="secondary" className="text-[10px] font-normal px-1.5 py-0.5 bg-[#555] text-gray-200 rounded-full whitespace-nowrap">{artist}</Badge>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+      
+      {/* Persona Grid - Now uses otherPersonas */}
+      <div className="pt-6 border-t border-[#282828]">
+        <h2 className="text-2xl font-bold mb-4 text-center text-white">Choose a Persona Vibe</h2>
+         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {otherPersonas.map((persona) => (
+              <Card
+                key={persona.id}
+                className={`cursor-pointer transition-all duration-200 ease-in-out bg-[#181818] border-[#282828] text-white hover:bg-[#282828] flex flex-col justify-between ${selectedPersonaId === persona.id ? 'ring-2 ring-green-500' : ''}`}
                 onClick={() => handlePersonaSelect(persona.id)}
               >
-                <CardHeader className="flex flex-row items-start gap-4 p-4">
-                  {getPersonaIcon(persona.name)}
-                  <div className="space-y-1">
-                    <CardTitle className="text-base font-bold">{persona.name}</CardTitle>
-                    <CardDescription className="text-xs text-muted-foreground leading-tight">{persona.description}</CardDescription>
+                <CardHeader className="p-3 space-y-1.5">
+                  <div className="flex flex-row items-center gap-3">
+                    {getPersonaIcon(persona.name)}
+                    <CardTitle className="text-sm font-bold">{persona.name}</CardTitle>
                   </div>
+                  <CardDescription className="text-xs text-muted-foreground leading-tight line-clamp-2">
+                    {persona.description}
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <div className="flex flex-wrap gap-1">
+                <CardContent className="p-3 pt-1 flex items-center justify-between">
+                  <div className="flex flex-wrap gap-1 flex-grow mr-2">
                     {persona.artists.slice(0, 3).map(artist => (
-                      <Badge key={artist} variant="secondary" className="text-[10px] font-normal px-2 py-0.5 bg-[#333] text-gray-300 rounded-full">{artist}</Badge>
+                      <Badge key={artist} variant="secondary" className="text-[10px] font-normal px-1.5 py-0.5 bg-[#333] text-gray-300 rounded-full whitespace-nowrap">{artist}</Badge>
                     ))}
-                    {persona.artists.length > 3 && <Badge variant="secondary" className="text-[10px] font-normal px-2 py-0.5 bg-[#333] text-gray-300 rounded-full">+more</Badge>}
                   </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-xs text-muted-foreground hover:text-white hover:bg-[#282828] px-1.5 py-0.5 h-auto flex-shrink-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenPersonaModal(persona);
+                    }}
+                    title={`More info about ${persona.name}`}
+                  >
+                    <Info className="h-3 w-3 mr-1" /> Info
+                  </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+
+      <PersonaModal 
+        persona={selectedPersonaForModal} 
+        isOpen={!!selectedPersonaForModal} 
+        onClose={handleClosePersonaModal} 
+        onSelectPersona={handlePersonaSelect}
+        selectedPersonaId={selectedPersonaId}
+      />
     </div>
   )
 }

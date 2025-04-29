@@ -29,7 +29,7 @@ export default function RootLayout({
             <div className="w-64 border-r dark:border-neutral-800 p-4 flex-shrink-0 hidden md:block">
               <AppSidebar />
             </div>
-            <main className="flex-1 overflow-auto">
+            <main className="flex-1 overflow-auto px-10">
               {children}
             </main>
           </div>

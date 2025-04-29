@@ -4,16 +4,24 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Loader2, Sparkles, Search } from "lucide-react"
+import { Loader2, Sparkles, Search, Laptop, Truck, Guitar, Music } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
 import { MoodFilters } from "./mood-filters"
 import { MoodPresets } from "./mood-presets"
 import { toast } from "sonner"
-import type { Persona } from "@/lib/personas"
+import { type Persona, personas } from "@/lib/personas"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+
+const getPersonaIcon = (personaName: string): JSX.Element => {
+  if (personaName.includes("Online")) return <Laptop className="h-6 w-6 text-green-500" />;
+  if (personaName.includes("Country")) return <Truck className="h-6 w-6 text-green-500" />;
+  if (personaName.includes("Rock")) return <Guitar className="h-6 w-6 text-green-500" />;
+  return <Music className="h-6 w-6 text-green-500" />;
+};
 
 interface MoodFormProps {
   filters: {
@@ -38,15 +46,13 @@ export function MoodForm({
   onFilterChange,
   onSelectMood,
   isLoading,
-  currentMood,
+  currentMood
 }: MoodFormProps) {
-  return (
-    <div className="space-y-4 mb-4 mt-4">
-      <MoodPresets onSelectMood={onSelectMood} currentMood={currentMood} />
 
-      <div className="space-y-4">
-        <MoodFilters onFilterChange={onFilterChange} />
-      </div>
+  return (
+    <div className="space-y-6">
+      <MoodPresets onSelectMood={onSelectMood} currentMood={currentMood} disabled={isLoading} />
+      <MoodFilters filters={filters} onFilterChange={onFilterChange} disabled={isLoading} />
     </div>
   )
 }

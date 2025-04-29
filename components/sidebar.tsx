@@ -1,44 +1,50 @@
 import Link from "next/link"
-import { Home, Search, Library, Plus, Heart, Music } from "lucide-react"
+import { Home, Search, Library, Plus, Heart, Music, Folder, Briefcase, Coffee, ThumbsUp, ThumbsUpIcon, Github, GitBranch, BadgeDollarSign, DollarSign, Music2, Music3, Music4, LibraryBig, LibrarySquare, Waves, LucideWaves, HandHelping, HandCoins, HandHeart, HandMetal, LucideHand, User, User2, Smile, Egg, Rocket } from "lucide-react"
+import { Profiler } from "react"
+import { Avatar, AvatarImage } from "@radix-ui/react-avatar"
+import { AvatarFallback } from "./ui/avatar"
 
 export function Sidebar() {
   return (
     <aside className="flex flex-col h-full">
       <div className="mb-8 pt-4">
-        <Link href="/" className="flex items-center gap-2 text-white font-bold text-xl mb-8">
-          <Music className="h-8 w-8 text-[#1DB954]" />
-          <span>Moodify</span>
+        <Link href="/" className="flex items-center gap-2 text-[#1DB954] font-bold text-xl mb-1">
+          <Music4 className="h-9 w-9 text-[#1DB954]" />
+          <span className= "font-bold">Mood 2 Song</span>
         </Link>
+        <span className= "flex gap-2 text-muted-foreground items-center font-bold text-xs mb-8">(M2S for short!)</span>
+
 
         <nav className="space-y-4">
-          <Link href="/" className="flex items-center gap-3 text-white hover:text-[#1DB954] transition-colors">
-            <Home className="h-6 w-6" />
-            <span className="font-semibold">My other projects</span>
+          <Link href="https://blakemakesthings.com" className="flex items-center gap-3 text-muted-foreground hover:text-[#1DB954] transition-colors">
+            <Smile className="h-6 w-6" />
+            <span className="font-semibold">Hi! I'm Blake</span>
           </Link>
-          <Link href="#" className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors">
-            <Search className="h-6 w-6" />
+          <Link href="https://github.com/BlakeDanielson/mood2song" className="flex items-center gap-3 text-muted-foreground hover:text-[#1DB954] transition-colors">
+            <GitBranch className="h-6 w-6" />
+            <span className="font-semibold">M2S Github</span>
+          </Link>
+          <Link href="https://github.com/BlakeDanielson" className="flex items-center gap-3 text-muted-foreground hover:text-[#1DB954] transition-colors">
+            <Github className="h-6 w-6" />
             <span className="font-semibold">My Github</span>
           </Link>
-          <Link href="#" className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors">
+          <Link href="https://www.blakemakesthings.com/contact" className="flex items-center gap-3 text-muted-foreground hover:text-[#1DB954] transition-colors">
+            <Briefcase className="h-6 w-6" />
+            <span className="font-semibold">Try and recruit me</span>
+          </Link>
+          <Link href="https://jumpscare.pro" className="flex items-center gap-3 text-muted-foreground hover:text-[#1DB954] transition-colors">
+            <Rocket className="h-6 w-6" />
+            <span className="font-semibold">Jumpscare Generator</span>
+          </Link>
+          <Link href="https://www.beatstars.com/BLVKE" className="flex items-center gap-3 text-muted-foreground hover:text-[#1DB954] transition-colors">
             <Library className="h-6 w-6" />
-            <span className="font-semibold">Listen to my music</span>
+            <span className="font-semibold">Buy My Beats</span>
+          </Link>
+          <Link href="https://www.buymeacoffee.com/BLVKE" className="flex items-center gap-3 text-muted-foreground hover:text-[#1DB954] transition-colors">
+            <Coffee className="h-6 w-6 text-[#1DB954]" />
+            <span className="font-semibold">Buy Me A Coffee</span>
           </Link>
         </nav>
-      </div>
-
-      <div className="mt-8 space-y-4">
-        <div className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors cursor-pointer">
-          <div className="bg-muted-foreground/30 p-1 rounded">
-            <Plus className="h-4 w-4" />
-          </div>
-          <span className="font-semibold">Try and recruit me</span>
-        </div>
-        <div className="flex items-center gap-3 text-muted-foreground hover:text-white transition-colors cursor-pointer">
-          <div className="bg-gradient-to-br from-purple-600 to-blue-400 p-1 rounded">
-            <Heart className="h-4 w-4" />
-          </div>
-          <span className="font-semibold">Buy me a coffee</span>
-        </div>
       </div>
 
       <div className="mt-8 pt-8 border-t border-muted">
