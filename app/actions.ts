@@ -26,6 +26,7 @@ const songSchema = z.object({
 export interface SongData {
   title: string;
   artist: string;
+  album?: string;
   link?: string;
   reason?: string;
   year?: string;
@@ -34,6 +35,7 @@ export interface SongData {
   spotifyUri?: string;
   previewUrl?: string | null;
   spotifyUrl?: string;
+  artistSpotifyUrl?: string;
   albumArt?: string;
   embedUrl?: string;
   popularity?: number;
@@ -63,193 +65,261 @@ export interface FindSongsErrorResponse {
 // Combined type for the return value of findSongs
 export type FindSongsResponse = FindSongsSuccessResponse | FindSongsErrorResponse;
 
+// Updated parameters for findSongs
+interface FindSongsParams {
+  mood?: string;
+  personaId?: string;
+  options?: {
+    genre?: string;
+    era?: string;
+    popularity?: string;
+    language?: string;
+    excludeMainstream?: boolean;
+  };
+}
 
 // Store the current recommendations in cookies
-export async function findSongs(
-  moodOrPersona: string | { personaId: string },
-  options: {
-    genre?: string
-    era?: string
-    popularity?: string
-    language?: string
-    excludeMainstream?: boolean
-  } = {},
-): Promise<FindSongsResponse> {
+export async function findSongs({
+  mood,
+  personaId,
+  options = {}
+}: FindSongsParams): Promise<FindSongsResponse> {
   let prompt = "";
   let selectedPersona: Persona | null = null;
-  let currentMood = "";
-  let finalFilters = { ...options };
+  let currentMood = mood || ""; // Use provided mood or empty string
+  let finalFilters = { ...options }; // Use provided options
 
-  let personaId: string | undefined = undefined;
-
-  if (typeof moodOrPersona === 'object' && moodOrPersona !== null && 'personaId' in moodOrPersona) {
-    personaId = moodOrPersona.personaId;
-  }
-
+  // Find persona if ID is provided
   if (personaId) {
     selectedPersona = personas.find(p => p.id === personaId) ?? null;
-
-    if (selectedPersona) {
-      currentMood = `Based on the ${selectedPersona.name} persona`;
-      prompt = `You are the ${selectedPersona.name}, ${selectedPersona.description}. `;
-      prompt += 'Your favorite artists are: ' + selectedPersona.artists.join(', ');
-      prompt += 'Do not recommend more than 2 songs by your favorite artists. And do not recommend more than 1 song by the same artist.';
-      prompt += `Generate a list of 4 song recommendations that fit your persona. `;
-      prompt += `Focus on songs and artists that ${selectedPersona.traits.join(', ')} `;
-      prompt += `Explain briefly why each song fits the ${selectedPersona.name} vibe. `;
-
-      // Apply filters from options to the prompt if provided
-      const { genre, era, popularity, language, excludeMainstream } = options
-      if (genre) prompt += ` Focus on the ${genre} genre.`
-      if (era) prompt += ` Prefer songs from the ${era} era.`
-      if (popularity === "obscure") prompt += ` Recommend lesser-known, obscure tracks.`
-      else if (popularity === "indie") prompt += ` Focus on independent artists.`
-      else if (popularity === "classic") prompt += ` Recommend timeless classics.`
-      if (language) prompt += ` Include songs in ${language}.`
-      if (excludeMainstream) prompt += ` Avoid extremely popular songs.`
-      prompt += ` Aim for diversity. Include at least one lesser-known artist.`
-      prompt += `
-        For each song, provide: title, artist, reason (why it matches mood), year, genre.
-        Format your response as a JSON object containing ONLY a 'songs' array (with title, artist, reason, year, genre properties).
-      `;
-      console.log("Using Persona Prompt for:", selectedPersona.name);
-
-    } else {
-      console.warn(`Persona with ID "${personaId}" not found. Falling back to default recommendations.`);
-      personaId = undefined;
+    if (!selectedPersona) {
+      console.warn(`Persona with ID "${personaId}" not found. Proceeding without persona.`);
+      personaId = undefined; // Clear invalid personaId
     }
   }
 
-  if (!selectedPersona) {
-    if (typeof moodOrPersona !== 'string') {
-      console.error("Invalid arguments: Expected mood string when no valid personaId provided.");
-      throw new Error("Invalid arguments for song generation.");
-    }
-    currentMood = moodOrPersona;
-    const { genre, era, popularity, language, excludeMainstream } = options
+  // --- Prompt Generation Logic ---
+  const baseInstruction = `Recommend 10 *new* and *different* song recommendations.`;
+  const constraints = `Do not recommend more than 1 song by the same artist. Aim for diversity and include at least one lesser-known artist.`;
+  const outputFormat = `
+    For each song, provide: title, artist, reason (explaining the connection), year, genre.
+    Format your response as a JSON object containing ONLY a 'songs' array (with title, artist, album, reason, year, genre properties). Ensure the JSON is valid.
+  `;
+  const filterInstructions = (() => {
+      let filterText = "";
+      const { genre, era, popularity, language, excludeMainstream } = options;
+      if (genre && genre !== 'any') filterText += ` Focus on the ${genre} genre.`;
+      if (era && era !== 'any') filterText += ` Prefer songs from the ${era} era.`;
+      if (popularity === "obscure") filterText += ` Recommend lesser-known, obscure tracks.`;
+      else if (popularity === "indie") filterText += ` Focus on independent artists.`;
+      else if (popularity === "classic") filterText += ` Recommend timeless classics.`;
+      if (language && language !== 'any') filterText += ` Include songs in ${language}.`;
+      if (excludeMainstream) filterText += ` Avoid extremely popular songs.`;
+      return filterText;
+  })();
 
-    prompt = `Based on the mood "${currentMood}", recommend 4 songs that would match this feeling.`
-    if (genre) prompt += ` Focus on the ${genre} genre.`
-    if (era) prompt += ` Prefer songs from the ${era} era.`
-    if (popularity === "obscure") prompt += ` Recommend lesser-known, obscure tracks.`
-    else if (popularity === "indie") prompt += ` Focus on independent artists.`
-    else if (popularity === "classic") prompt += ` Recommend timeless classics.`
-    if (language) prompt += ` Include songs in ${language}.`
-    if (excludeMainstream) prompt += ` Avoid extremely popular songs.`
-    prompt += ` Aim for diversity. Include at least one lesser-known artist.`
-    prompt += `
-      For each song, provide: title, artist, reason (why it matches mood), year, genre.
-      Format your response as a JSON object containing ONLY a 'songs' array (with title, artist, reason, year, genre properties).
-    `;
-    console.log("Using Filter/Mood Prompt for:", currentMood);
-    finalFilters = options;
+  if (selectedPersona && currentMood) {
+    // Case 1: Both Persona and Mood provided
+    prompt = `You are the ${selectedPersona.name}, ${selectedPersona.description}. `;
+    prompt += `Your favorite artists are: ${selectedPersona.artists.join(', ')}. `;
+    prompt += `Generate recommendations that fit your persona *and* match the mood "${currentMood}". `;
+    prompt += `Focus on songs and artists that ${selectedPersona.traits.join(', ')}. `;
+    prompt += `Explain briefly why each song fits both the ${selectedPersona.name} vibe *and* the "${currentMood}" mood. `;
+    prompt += baseInstruction;
+    prompt += filterInstructions;
+    prompt += constraints;
+    prompt += `Do not recommend more than 2 songs by your favorite artists.`;
+    prompt += outputFormat;
+    console.log("Using Combined Persona & Mood Prompt for:", selectedPersona.name, "and Mood:", currentMood);
+
+  } else if (selectedPersona) {
+    // Case 2: Only Persona provided
+    prompt = `You are the ${selectedPersona.name}, ${selectedPersona.description}. `;
+    prompt += `Your favorite artists are: ${selectedPersona.artists.join(', ')}. `;
+    prompt += `Generate recommendations that fit your persona. `;
+    prompt += `Focus on songs and artists that ${selectedPersona.traits.join(', ')}. `;
+    prompt += `Explain briefly why each song fits the ${selectedPersona.name} vibe. `;
+    prompt += baseInstruction;
+    prompt += filterInstructions;
+    prompt += constraints;
+    prompt += `Do not recommend more than 2 songs by your favorite artists.`;
+    prompt += outputFormat;
+    console.log("Using Persona Prompt for:", selectedPersona.name);
+
+  } else if (currentMood) {
+    // Case 3: Only Mood provided
+    prompt = `Based on the mood "${currentMood}", ${baseInstruction}`;
+    prompt += filterInstructions;
+    prompt += constraints;
+    prompt += `Explain briefly why each song matches the "${currentMood}" mood.`;
+    prompt += outputFormat;
+    console.log("Using Mood Prompt for:", currentMood);
+
+  } else {
+    // Case 4: Neither Mood nor Persona provided (Error case)
+    console.error("Invalid arguments: Mood or Persona required for song generation.");
+    return {
+      error: "Invalid arguments for song generation. Please provide a mood or select a persona.",
+      persona: null,
+    };
   }
 
   try {
-    console.log(personaId)
+    // Ensure personaId being logged matches the potentially cleared one if invalid
+    console.log("Selected Persona ID for request:", personaId);
+    console.log("Current Mood:", currentMood);
+    console.log("Applied Filters:", finalFilters);
     console.log("--- Sending Prompt to AI ---");
     console.log(prompt);
     console.log("-----------------------------");
 
     const { text } = await generateText({
-      model: openai("gpt-4.1"),
+      // model: openai("gpt-4.1"), // Consider gpt-4o or a newer model if available/preferred
+      model: openai("gpt-4o"),
       prompt,
+      temperature: 0.9,
     })
 
+    console.log("--- Received Response from AI ---");
+    console.log(text);
+    console.log("--------------------------------");
 
-    const jsonMatch =
-      text.match(/```json\n([\s\S]*?)\n```/) ||
-      text.match(/```\n([\s\S]*?)\n```/) ||
-      text.match(/{[\s\S]*}/) ||
-      text.match(/\[[\s\S]*\]/)
-
-    let parsedData;
-    if (jsonMatch) {
-      const jsonString = jsonMatch[1] || jsonMatch[0];
-      try {
-        parsedData = JSON.parse(jsonString);
-      } catch (parseError) {
-        console.error("Failed to parse extracted JSON:", parseError);
-        console.error("JSON String attempted:", jsonString);
-        throw new Error("AI returned malformed JSON.");
-      }
+    let jsonString = "";
+    const jsonBlockMatch = text.match(/```json\\s*([\\s\\S]*?)\\s*```/);
+    if (jsonBlockMatch && jsonBlockMatch[1]) {
+        jsonString = jsonBlockMatch[1].trim();
     } else {
-        console.error("Could not extract JSON from AI response:", text);
-        throw new Error("AI response did not contain expected JSON format.");
+        const genericBlockMatch = text.match(/```\\s*([\\s\\S]*?)\\s*```/);
+        if (genericBlockMatch && genericBlockMatch[1]) {
+            jsonString = genericBlockMatch[1].trim();
+            if (!jsonString.startsWith("{") && !jsonString.startsWith("[")) {
+                jsonString = "";
+            }
+        } else {
+            const firstBrace = text.indexOf('{');
+            const firstBracket = text.indexOf('[');
+            let startIndex = -1;
+
+            if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+                startIndex = firstBrace;
+            } else if (firstBracket !== -1) {
+                startIndex = firstBracket;
+            }
+
+            if (startIndex !== -1) {
+                const lastBrace = text.lastIndexOf('}');
+                const lastBracket = text.lastIndexOf(']');
+                let endIndex = -1;
+
+                if (startIndex === firstBrace && lastBrace !== -1) {
+                    endIndex = lastBrace;
+                } else if (startIndex === firstBracket && lastBracket !== -1) {
+                     let openCount = 0;
+                     let potentialEndIndex = -1;
+                     for(let i = startIndex; i < text.length; i++) {
+                         if (text[i] === '[') openCount++;
+                         else if (text[i] === ']') openCount--;
+                         if (openCount === 0 && startIndex === i) continue;
+                         if (openCount === 0 && text[i] === ']') {
+                            potentialEndIndex = i;
+                            break;
+                         }
+                     }
+                     endIndex = potentialEndIndex !== -1 ? potentialEndIndex : lastBracket;
+                } else if (lastBrace > lastBracket) {
+                    endIndex = lastBrace;
+                } else {
+                    endIndex = lastBracket;
+                }
+
+
+                if (endIndex > startIndex) {
+                    jsonString = text.substring(startIndex, endIndex + 1).trim();
+                }
+            }
+        }
     }
 
-    const validatedData = songSchema.parse(parsedData);
-    const songsArray = validatedData.songs;
+    if (!jsonString) {
+      console.error("Could not extract JSON from AI response:", text);
+      throw new Error("AI response did not contain expected JSON format.");
+    }
 
-    const spotifyTracks = await Promise.all(
-      songsArray.map(async (song) => {
-        const query = `track:${song.title} artist:${song.artist}${song.year ? ` year:${song.year}` : ""}`;
-        const result = await searchTracks(query);
-        if (result?.tracks?.items.length > 0) {
-          const track = result.tracks.items[0];
-          return {
-            ...song,
-            spotifyId: track.id,
-            spotifyUri: track.uri,
-            previewUrl: track.preview_url,
-            spotifyUrl: track.external_urls.spotify,
-            albumArt: track.album.images[0]?.url,
-            embedUrl: `https://open.spotify.com/embed/track/${track.id}`,
-            popularity: track.popularity,
-            releaseDate: track.album.release_date,
-          };
-        }
-        const broadQuery = `${song.title} ${song.artist}`;
-        const broadResult = await searchTracks(broadQuery);
-        if (broadResult?.tracks?.items.length > 0) {
-           const track = broadResult.tracks.items[0];
-           return {
-             ...song,
-             spotifyId: track.id,
-             spotifyUri: track.uri,
-             previewUrl: track.preview_url,
-             spotifyUrl: track.external_urls.spotify,
-             albumArt: track.album.images[0]?.url,
-             embedUrl: `https://open.spotify.com/embed/track/${track.id}`,
-             popularity: track.popularity,
-             releaseDate: track.album.release_date,
-           };
-        }
-        return song;
-      }),
+    let parsedData: { songs: any[] };
+    try {
+      parsedData = songSchema.parse(JSON.parse(jsonString));
+    } catch (parseError) {
+      console.error("Failed to parse JSON from AI:", parseError);
+      console.error("Invalid JSON string received:", jsonString);
+      throw new Error("AI returned malformed JSON structure.");
+    }
+
+    if (!parsedData || !Array.isArray(parsedData.songs)) {
+      console.error("Parsed data is not in the expected format (object with songs array):", parsedData);
+      throw new Error("AI response did not contain a valid 'songs' array.");
+    }
+
+    // Enrich with Spotify data
+    const enrichedSongs: SongData[] = await Promise.all(
+      parsedData.songs.map(async (song) => {
+        const query = `${song.title} artist:${song.artist}`;
+        const spotifyData = await searchTracks(query, 1); // Fetch only the top track match
+        const track = spotifyData?.tracks?.items?.[0];
+
+        let spotifyUrl = track?.external_urls?.spotify;
+        let artistSpotifyUrl = track?.artists?.[0]?.external_urls?.spotify; // <-- Get artist URL
+        let albumArt = track?.album?.images?.[0]?.url; // Use largest image
+        let embedUrl = spotifyUrl ? `https://open.spotify.com/embed/track/${track.id}` : undefined;
+        let previewUrl = track?.preview_url;
+        let popularity = track?.popularity;
+        let releaseDate = track?.album?.release_date;
+        let album = track?.album?.name;
+
+        return {
+          ...song,
+          title: track?.name || song.title, // Prefer Spotify's title if available
+          artist: track?.artists?.map((a: any) => a.name).join(", ") || song.artist, // Prefer Spotify's artist(s)
+          album: album || song.album,
+          spotifyId: track?.id,
+          spotifyUri: track?.uri,
+          spotifyUrl: spotifyUrl,
+          artistSpotifyUrl: artistSpotifyUrl, // <-- Add artist URL to returned object
+          albumArt: albumArt,
+          embedUrl: embedUrl,
+          previewUrl: previewUrl,
+          popularity: popularity,
+          releaseDate: releaseDate,
+          year: song.year || (releaseDate ? new Date(releaseDate).getFullYear().toString() : undefined),
+          genre: song.genre || track?.album?.genres?.[0] || undefined, // Add fallback genre from track if needed
+        };
+      })
     );
 
-    const timestamp = new Date().toISOString();
-    const cookieStore = await cookies();
+    console.log("--- Enriched Songs ---");
+    console.log(JSON.stringify(enrichedSongs, null, 2));
+    console.log("--------------------");
 
-    const resultData: FindSongsSuccessResponse = {
-      songs: spotifyTracks,
+    const successResponse: FindSongsSuccessResponse = {
+      songs: enrichedSongs,
       mood: currentMood,
       filters: finalFilters,
       persona: selectedPersona ? { id: selectedPersona.id, name: selectedPersona.name } : null,
-      timestamp,
+      timestamp: new Date().toISOString(),
+    }
+
+    // Save to cookies (optional, implement if needed)
+    // cookies().set("latestRecommendations", JSON.stringify(successResponse))
+    // revalidatePath("/")
+
+    return successResponse;
+
+  } catch (error: any) {
+    console.error("Error in findSongs processing:", error);
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred during song processing.";
+    return {
+      error: errorMessage,
+      persona: selectedPersona ? { id: selectedPersona.id, name: selectedPersona.name } : null,
     };
-
-    cookieStore.set(
-      "songRecommendations",
-      JSON.stringify(resultData),
-      {
-        maxAge: 60 * 60 * 24,
-        path: "/",
-      },
-    );
-
-    revalidatePath("/", "layout");
-
-    return resultData;
-
-  } catch (error) {
-    console.error("Error in findSongs:", error);
-    const errorResponse: FindSongsErrorResponse = {
-       error: error instanceof Error ? error.message : "Failed to generate recommendations.",
-       persona: selectedPersona ? { id: selectedPersona.id, name: selectedPersona.name } : null,
-     };
-     return errorResponse;
   }
 }
 

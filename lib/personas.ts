@@ -11,7 +11,7 @@ export interface Persona {
 export const personas: Persona[] = [
   {
       id: 'persona-1-alt-experimental',
-      name: 'The Terminally Online Alt/Experimentalist',
+      name: 'Terminally Online',
       description: 'Your Spotify Wrapped is basic trash. I liked Death Grips before Fantano.', // UNHINGED
       imageUrl: 'https://picsum.photos/id/1/64/64', // Placeholder
       traits: ['experimental', 'noise', 'industrial', 'hyperpop', 'glitchcore', 'avant-garde', 'underground', 'anti-pop', 'challenging', 'dissonant', 'online', 'niche', 'DIY'],
@@ -107,5 +107,68 @@ export const personas: Persona[] = [
       traits: ['EDM', 'electronic', 'bass music', 'dubstep', 'riddim', 'headbanging', 'rail breaker', 'filthy', 'heavy', 'intense', 'bass cannon', 'brain-melting'], // Added brain-melting
       moods: ['aggressive', 'intense', 'energetic', 'cathartic', 'headbanging', 'mosh pit', 'hype', 'destructive'], // Added destructive
       artists: ['Subtronics', 'Excision', 'SVDDEN DEATH', 'Marauda', 'Liquid Stranger', 'Ganja White Night', 'Wooli', 'Kai Wachi', 'Space Laces']
+  },
+  {
+      id: 'persona-9-vaporwave-nostalgia',
+      name: 'The Mallsoft Ghost',
+      description: 'Trapped in a K-Mart commercial from \'92. The Muzak is my soul. Consumerism is dead but the vibes are eternal.', // UNHINGED
+      imageUrl: 'https://picsum.photos/id/12/64/64', // Placeholder
+      traits: ['vaporwave', 'mallsoft', 'plunderphonics', 'nostalgic', 'ironic', 'ambient', 'Muzak', 'corporate aesthetic', 'chillwave', 'hypnagogic pop', 'internet culture', 'liminal space'],
+      moods: ['nostalgic', 'melancholic', 'detached', 'dreamy', 'ironic', 'empty', 'serene', 'ethereal', 'lost'],
+      artists: ['Macintosh Plus', 'Blank Banshee', 'Vektroid', 'Saint Pepsi', '猫 シ Corp.', 'death\'s dynamic shroud.wmv', 'ESPRIT 空想', 'Luxury Elite', 'George Clanton']
+  },
+  {
+      id: 'persona-10-post-punk-librarian',
+      name: 'The Post-Punk Librarian',
+      description: 'Silence! Except for this monotone bassline from 1981. My Dewey Decimal System is based on existential dread.', // UNHINGED
+      imageUrl: 'https://picsum.photos/id/13/64/64', // Placeholder
+      traits: ['post-punk', 'goth rock', 'coldwave', 'darkwave', 'minimal synth', 'angular', 'atmospheric', 'brooding', 'intellectual', 'monotone'],
+      moods: ['introspective', 'melancholic', 'detached', 'anxious', 'brooding', 'intellectual', 'dour', 'focused'],
+      artists: ['Joy Division', 'The Cure', 'Siouxsie and the Banshees', 'Bauhaus', 'Interpol', 'Editors', 'Molchat Doma', 'Lebanon Hanover']
+  },
+  {
+      id: 'persona-11-math-rock-maestro',
+      name: 'The Math Rock Maestro',
+      description: 'Time signatures are my love language. If it\'s not in 11/8, is it even music? Your polyrhythms are weak.', // UNHINGED
+      imageUrl: 'https://picsum.photos/id/14/64/64', // Placeholder
+      traits: ['math rock', 'progressive rock', 'experimental rock', 'technical', 'complex', 'intricate', 'odd time signatures', 'tapping', 'instrumental', 'precise'],
+      moods: ['focused', 'analytical', 'energetic', 'cerebral', 'intense', 'studious', 'mind-bending'],
+      artists: ['CHON', 'Polyphia', 'Animals As Leaders', 'Toe', 'Tera Melos', 'Covet', 'TTNG', 'Don Caballero']
+  },
+  {
+      id: 'persona-12-musical-theatre-kid',
+      name: 'The Campy Musical Theatre Kid',
+      description: 'LIFE IS A CABARET, OLD CHUM! *Belts uncontrollably*. My jazz hands have broken several lamps. WORTH IT.', // UNHINGED
+      imageUrl: 'https://picsum.photos/id/15/64/64', // Placeholder
+      traits: ['musical theatre', 'broadway', 'show tunes', 'soundtrack', 'vocal performance', 'belting', 'dramatic', 'campy', 'expressive', 'ost'],
+      moods: ['dramatic', 'energetic', 'happy', 'sad (but performatively)', 'expressive', 'theatrical', 'optimistic', 'over-the-top'],
+      artists: ['Stephen Sondheim', 'Lin-Manuel Miranda', 'Andrew Lloyd Webber', 'Pasek and Paul', 'Original Broadway Cast Recordings', 'Glee Cast', 'Barbra Streisand', 'Idina Menzel']
+  },
+  {
+      id: 'persona-13-soul-groover',
+      name: 'The Old-School Soul Groover',
+      description: 'Digital music has no soul, man. It\'s gotta crackle. Needs that WARMTH. Let the bassline hug your heart.', // UNHINGED
+      imageUrl: 'https://picsum.photos/id/16/64/64', // Placeholder
+      traits: ['soul', 'funk', 'r&b', 'motown', 'stax', '60s', '70s', 'vinyl', 'analog', 'smooth', 'groovy', 'classic'],
+      moods: ['smooth', 'groovy', 'relaxed', 'soulful', 'happy', 'nostalgic', 'warm', 'dancing (slow jam)', 'cool'],
+      artists: ['Marvin Gaye', 'Stevie Wonder', 'Aretha Franklin', 'James Brown', 'Otis Redding', 'Al Green', 'Curtis Mayfield', 'Earth, Wind & Fire', 'Sly & The Family Stone']
+  },
+  {
+      id: 'persona-14-eurobeat-racer',
+      name: 'The Eurobeat Racer',
+      description: 'GAS GAS GAS! GOTTA GO FAST! My heartbeat syncs to 160 BPM. Downshift and DANCE! Deja vu!', // UNHINGED
+      imageUrl: 'https://picsum.photos/id/17/64/64', // Placeholder
+      traits: ['eurobeat', 'hi-nrg', 'italo disco', 'synthwave (adjacent)', 'driving', 'racing', 'high energy', 'fast tempo', 'electronic', 'anime soundtrack', 'initial d'],
+      moods: ['energetic', 'driving', 'hype', 'motivated', 'racing', 'intense', 'euphoric', 'nostalgic (90s anime)'],
+      artists: ['Dave Rodgers', 'Manuel', 'Mega NRG Man', 'Leslie Parrish', 'Niko', 'Go 2', 'Initial D Soundtracks', 'Ken Laszlo', 'Max Coveri']
+  },
+  {
+      id: 'persona-15-asmr-soundscaper',
+      name: 'The ASMR Soundscaper',
+      description: 'Shhh. Listen to the micro-textures. The gentle rustle of tape hiss... *tingle*... Yes, that\'s the good stuff. Pure sound.', // UNHINGED
+      imageUrl: 'https://picsum.photos/id/18/64/64', // Placeholder
+      traits: ['ambient', 'drone', 'field recordings', 'soundscape', 'asmr triggers', 'textural', 'minimalist', 'experimental electronic', 'lo-fi ambient', 'relaxing', 'sound art'],
+      moods: ['calm', 'relaxed', 'focused', 'introspective', 'meditative', 'sleepy', 'tingly', 'peaceful', 'eerie (sometimes)'],
+      artists: ['Brian Eno', 'Aphex Twin (Ambient Works)', 'Stars of the Lid', 'Hiroshi Yoshimura', 'William Basinski', 'Tim Hecker', 'Biosphere', 'GAS (Wolfgang Voigt)']
   }
 ];

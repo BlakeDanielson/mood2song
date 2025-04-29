@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
 
 interface MoodFiltersProps {
   onFilterChange: (filters: {
@@ -11,7 +10,6 @@ interface MoodFiltersProps {
     era?: string
     popularity?: string
     language?: string
-    excludeMainstream?: boolean
   }) => void
 }
 
@@ -23,36 +21,26 @@ export function MoodFilters({
     era: "",
     popularity: "",
     language: "",
-    excludeMainstream: false,
   })
 
-  const handleFilterChange = (key: string, value: string | boolean) => {
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
     const newFilters = { ...filters, [key]: value }
     setFilters(newFilters)
     onFilterChange(newFilters)
   }
 
   return (
-    <div className="mt-4 p-2 bg-[#282828] rounded-md">
-      <div className="mb-4 flex items-center space-x-2">
-        <Switch
-          id="exclude-mainstream"
-          checked={filters.excludeMainstream}
-          onCheckedChange={(checked) => handleFilterChange("excludeMainstream", checked)}
-          className="data-[state=checked]:bg-[#1DB954]"
-        />
-        <Label htmlFor="exclude-mainstream" className="text-sm text-white">
-          Avoid mainstream hits
-        </Label>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
+    <div className="mt-4 p-4 bg-[#282828] rounded-md">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-2">
           <Label htmlFor="genre" className="text-sm text-muted-foreground">
             Genre
           </Label>
           <Select value={filters.genre} onValueChange={(value) => handleFilterChange("genre", value)}>
-            <SelectTrigger id="genre" className="bg-[#333333] border-none text-white">
+            <SelectTrigger 
+              id="genre" 
+              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050]"
+            >
               <SelectValue placeholder="Any genre" />
             </SelectTrigger>
             <SelectContent className="bg-[#333333] text-white border-[#444444]">
@@ -78,7 +66,10 @@ export function MoodFilters({
             Era
           </Label>
           <Select value={filters.era} onValueChange={(value) => handleFilterChange("era", value)}>
-            <SelectTrigger id="era" className="bg-[#333333] border-none text-white">
+            <SelectTrigger 
+              id="era" 
+              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050]"
+            >
               <SelectValue placeholder="Any era" />
             </SelectTrigger>
             <SelectContent className="bg-[#333333] text-white border-[#444444]">
@@ -100,7 +91,10 @@ export function MoodFilters({
             Discovery Level
           </Label>
           <Select value={filters.popularity} onValueChange={(value) => handleFilterChange("popularity", value)}>
-            <SelectTrigger id="popularity" className="bg-[#333333] border-none text-white">
+            <SelectTrigger 
+              id="popularity" 
+              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050]"
+            >
               <SelectValue placeholder="Any popularity" />
             </SelectTrigger>
             <SelectContent className="bg-[#333333] text-white border-[#444444]">
@@ -117,7 +111,10 @@ export function MoodFilters({
             Language
           </Label>
           <Select value={filters.language} onValueChange={(value) => handleFilterChange("language", value)}>
-            <SelectTrigger id="language" className="bg-[#333333] border-none text-white">
+            <SelectTrigger 
+              id="language" 
+              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050]"
+            >
               <SelectValue placeholder="Any language" />
             </SelectTrigger>
             <SelectContent className="bg-[#333333] text-white border-[#444444]">

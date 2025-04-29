@@ -131,10 +131,14 @@ export function SongRecommendations({
           <div className="flex justify-between items-center my-4">
             <div>
               <h2 className="text-2xl font-bold text-white">
-                {mood && <span>"{mood}" Playlist</span>}
-                {!mood && selectedPersona && <span>Recommendations for {selectedPersona.name}</span>}
-                {!mood && !selectedPersona && <span>Recommendations</span>}
+                {selectedPersona && mood && <span>{selectedPersona.name} picks for a "{mood}" mood</span>}
+                {selectedPersona && !mood && <span>{selectedPersona.name}'s Top Picks</span>}
+                {!selectedPersona && mood && <span>Your "{mood}" Recommendations</span>}
+                {!selectedPersona && !mood && <span>Recommendations</span>}
               </h2>
+              <h3 className="text-sm text-muted-foreground">
+                <span> Click a song to preview it. </span>
+              </h3>
 
               {activeFilters.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -154,107 +158,138 @@ export function SongRecommendations({
               className="text-muted-foreground hover:text-white hover:bg-[#333333]"
               title="Refresh Recommendations"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className="h-4 w-4 mr-2" /> Refresh Suggestions
             </Button>
           </div>
 
-          <div className="grid grid-cols-[auto_4fr_3fr_1fr] gap-4 px-2 py-2 border-b border-[#333333] text-sm text-muted-foreground mb-2">
-            <div className="text-center">#</div>
-            <div>TITLE</div>
-            <div>REASON</div>
-            <div className="text-right">YEAR</div>
-          </div>
-
-          <div className="space-y-1">
-            {songs.map((song, index) => (
-              <div key={`${song.title}-${song.artist}-${index}`} className="group">
-                <div
-                  className="grid grid-cols-[auto_4fr_3fr_1fr] gap-4 items-center px-2 py-2 group-hover:bg-[#282828] rounded-md cursor-pointer"
-                  onClick={() => toggleExpandSong(song.spotifyId || `${song.title}-${index}`)}
-                >
-                  <div className="flex items-center justify-center text-muted-foreground">
-                    <span className="group-hover:hidden w-4 text-center">{index + 1}</span>
-                    <Play className="h-4 w-4 hidden group-hover:block text-white" />
-                  </div>
-
-                  <div className="flex items-center gap-3 overflow-hidden">
-                    {song.albumArt ? (
-                      <img
-                        src={song.albumArt || "/placeholder.svg"}
-                        alt={`${song.title} album art`}
-                        className="w-10 h-10 object-cover rounded-sm flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 bg-[#333333] flex items-center justify-center rounded-sm flex-shrink-0">
-                        <Music2 className="h-5 w-5 text-muted-foreground" />
+          <table className="w-full table-auto border-collapse text-sm mt-2">
+            <thead>
+              <tr className="border-b border-[#333333]">
+                <th className="px-2 py-2 text-center font-medium text-muted-foreground w-2">#</th>
+                <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">TITLE</th>
+                <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">REASON</th>
+                <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">ALBUM</th>
+                <th className="px-2 py-2 text-center font-medium text-muted-foreground w-auto">YEAR</th>
+              </tr>
+            </thead>
+            <tbody>
+              {songs.map((song, index) => (
+                <>
+                  <tr 
+                    key={`${song.title}-${song.artist}-${index}`} 
+                    className="group border-b border-[#282828] hover:bg-[#282828] cursor-pointer"
+                    onClick={() => toggleExpandSong(song.spotifyId || `${song.title}-${index}`)}
+                  >
+                    <td className="px-2 py-2 text-center text-muted-foreground align-middle">
+                      <span className="group-hover:hidden w-4 inline-block text-center">{index + 1}</span>
+                      <Play className="h-4 w-4 hidden group-hover:inline-block text-white" />
+                    </td>
+                    <td className="px-2 py-2 align-middle">
+                      <div className="flex items-center gap-3">
+                        {song.albumArt ? (
+                          <img
+                            src={song.albumArt || "/placeholder.svg"}
+                            alt={`${song.title} album art`}
+                            className="w-10 h-10 object-cover rounded-sm flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-[#333333] flex items-center justify-center rounded-sm flex-shrink-0">
+                            <Music2 className="h-5 w-5 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          {song.spotifyUrl ? (
+                            <a 
+                              href={song.spotifyUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-white font-medium truncate group-hover:underline hover:text-[#1DB954] inline-block"
+                              title={`Listen to ${song.title} on Spotify`}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {song.title}
+                            </a>
+                          ) : (
+                            <div className="text-white font-medium truncate">{song.title}</div>
+                          )}
+                          {song.artistSpotifyUrl ? (
+                            <a 
+                              href={song.artistSpotifyUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block text-muted-foreground text-sm truncate group-hover:underline hover:text-[#1DB954]"
+                              title={`View ${song.artist} on Spotify`}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {song.artist}
+                            </a>
+                          ) : (
+                             <div className="block text-muted-foreground text-sm truncate">{song.artist}</div>
+                          )}
+                        </div>
                       </div>
-                    )}
-                    <div className="min-w-0">
-                      <div className="text-white font-medium truncate hover:underline">{song.title}</div>
-                      <div className="text-muted-foreground text-sm truncate hover:underline">{song.artist}</div>
-                    </div>
-                  </div>
-
-                  <div className="text-muted-foreground text-sm truncate">
-                    {song.reason || "-"}
-                  </div>
-
-                  <div className="text-muted-foreground text-sm text-right">
-                    {song.year || "-"}
-                  </div>
-                </div>
-
-                {expandedSong === (song.spotifyId || `${song.title}-${index}`) && (
-                  <div className="bg-[#282828] p-2 rounded-b-md -mt-1">
-                    {song.reason && (
-                      <div className="flex items-start mb-3 text-sm text-muted-foreground">
-                        <Info className="h-4 w-4 mr-2 mt-0.5 text-[#1DB954] flex-shrink-0" />
-                        <p>{song.reason}</p>
-                      </div>
-                    )}
-
-                    {song.embedUrl && (
-                      <div className="mt-2">
-                        <iframe
-                          src={song.embedUrl}
-                          width="100%"
-                          height="80"
-                          frameBorder="0"
-                          allow="encrypted-media"
-                          title={`${song.title} by ${song.artist}`}
-                          className="rounded"
-                        ></iframe>
-                      </div>
-                    )}
-
-                    {!song.embedUrl && song.spotifyUrl && (
-                      <a
-                        href={song.spotifyUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs flex items-center text-[#1DB954] hover:text-[#1ed760] mt-2"
-                      >
-                        <ExternalLink className="h-4 w-4 mr-1" /> Open in Spotify
-                      </a>
-                    )}
-
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      {song.genre && (
-                        <Badge variant="outline" className="bg-[#333333] text-white border-[#444444] text-xs">
-                          {song.genre}
-                        </Badge>
-                      )}
-                      {getPopularityLabel(song.popularity)?.label && (
-                        <Badge className={`bg-[#333333] text-white border-[#444444] text-xs`}>
-                          {getPopularityLabel(song.popularity)?.label}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+                    </td>
+                    <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle">
+                      {song.reason || "-"}
+                    </td>
+                    <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle">
+                      {song.album || "-"}
+                    </td>
+                    <td className="px-2 py-2 text-muted-foreground text-sm text-center align-middle">
+                      {song.year || "-"}
+                    </td>
+                  </tr>
+                  {expandedSong === (song.spotifyId || `${song.title}-${index}`) && (
+                    <tr className="bg-[#282828]">
+                      <td colSpan={5} className="p-4">
+                        {song.reason && (
+                          <div className="flex items-start mb-3 text-sm text-muted-foreground">
+                            <Info className="h-4 w-4 mr-2 mt-0.5 text-[#1DB954] flex-shrink-0" />
+                            <p>{song.reason}</p>
+                          </div>
+                        )}
+                        {song.embedUrl && (
+                          <div className="mt-2">
+                            <iframe
+                              src={song.embedUrl}
+                              width="100%"
+                              height="80"
+                              frameBorder="0"
+                              allow="encrypted-media"
+                              title={`${song.title} by ${song.artist}`}
+                              className="rounded"
+                            ></iframe>
+                          </div>
+                        )}
+                        {!song.embedUrl && song.spotifyUrl && (
+                          <a
+                            href={song.spotifyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs flex items-center text-[#1DB954] hover:text-[#1ed760] mt-2"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-1" /> Open in Spotify
+                          </a>
+                        )}
+                        <div className="flex flex-wrap gap-2 mt-4">
+                          {song.genre && (
+                            <Badge variant="outline" className="bg-[#333333] text-white border-[#444444] text-xs">
+                              {song.genre}
+                            </Badge>
+                          )}
+                          {getPopularityLabel(song.popularity)?.label && (
+                            <Badge className={`bg-[#333333] text-white border-[#444444] text-xs`}>
+                              {getPopularityLabel(song.popularity)?.label}
+                            </Badge>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
+              ))}
+            </tbody>
+          </table>
         </>
       )}
     </div>
