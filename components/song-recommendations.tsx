@@ -128,7 +128,7 @@ export function SongRecommendations({
 
       {!loading && !error && songs.length > 0 && (
         <>
-          <div className="flex justify-between items-center my-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 my-4">
             <div>
               <h2 className="text-2xl font-bold text-white">
                 {selectedPersona && mood && <span>{selectedPersona.name} picks for a "{mood}" mood</span>}
@@ -155,7 +155,7 @@ export function SongRecommendations({
               variant="ghost"
               size="sm"
               onClick={handleManualRefresh}
-              className="text-muted-foreground hover:text-white hover:bg-[#333333]"
+              className="text-muted-foreground hover:text-white hover:bg-[#333333] self-end sm:self-auto"
               title="Refresh Recommendations"
             >
               <RefreshCw className="h-4 w-4 mr-2" /> Refresh Suggestions
@@ -168,8 +168,8 @@ export function SongRecommendations({
                 <th className="px-2 py-2 text-center font-medium text-muted-foreground w-2">#</th>
                 <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">TITLE</th>
                 <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">REASON</th>
-                <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">ALBUM</th>
-                <th className="px-2 py-2 text-center font-medium text-muted-foreground w-auto">YEAR</th>
+                <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto hidden sm:table-cell">ALBUM</th>
+                <th className="px-2 py-2 text-center font-medium text-muted-foreground w-auto hidden sm:table-cell">YEAR</th>
               </tr>
             </thead>
             <tbody>
@@ -232,16 +232,16 @@ export function SongRecommendations({
                     <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle">
                       {song.reason || "-"}
                     </td>
-                    <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle">
+                    <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle hidden sm:table-cell">
                       {song.album || "-"}
                     </td>
-                    <td className="px-2 py-2 text-muted-foreground text-sm text-center align-middle">
+                    <td className="px-2 py-2 text-muted-foreground text-sm text-center align-middle hidden sm:table-cell">
                       {song.year || "-"}
                     </td>
                   </tr>
                   {expandedSong === (song.spotifyId || `${song.title}-${index}`) && (
                     <tr className="bg-[#282828]">
-                      <td colSpan={5} className="p-4">
+                      <td colSpan={3} className="sm:colSpan={5} p-4">
                         {song.reason && (
                           <div className="flex items-start mb-3 text-sm text-muted-foreground">
                             <Info className="h-4 w-4 mr-2 mt-0.5 text-[#1DB954] flex-shrink-0" />

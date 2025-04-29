@@ -170,8 +170,8 @@ export default function Home() {
   const showRecommendationsFirst = searchPerformed && !loading && !error && songs.length > 0;
 
   return (
-    <div className="mx-auto px-8 py-4">
-      <div className="flex items-center gap-4 mb-6">
+    <div className="mx-auto px-4 md:px-8 py-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-6">
         <div className="relative flex-grow">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-muted-foreground" />
@@ -186,7 +186,7 @@ export default function Home() {
             onKeyDown={(e) => { if (e.key === 'Enter') handleFindSongs(); }}
           />
         </div>
-        <div className="flex items-center space-x-2 flex-shrink-0">
+        <div className="flex items-center space-x-2 flex-shrink-0 self-center sm:self-auto">
           <Switch
             id="exclude-mainstream-toggle"
             checked={excludeMainstream}
@@ -202,7 +202,7 @@ export default function Home() {
           type="button"
           onClick={handleButtonClick}
           disabled={loading}
-          className="spotify-button rounded-full px-16 py-3 h-12 flex-shrink-0"
+          className="spotify-button rounded-full px-16 py-3 h-12 flex-shrink-0 w-full sm:w-auto"
         >
           {loading ? (
             <>
