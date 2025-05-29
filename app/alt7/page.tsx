@@ -509,7 +509,7 @@ export default function Alt7Page() {
         className="fixed bottom-6 right-6 z-40"
       >
         <a
-          href="https://buymeacoffee.com/yourusername"
+          href="https://buymeacoffee.com/blvke"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 backdrop-blur-md border border-white/20 group"
