@@ -8,9 +8,10 @@ import { Textarea } from '@/components/ui/textarea'
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void
+  disabled?: boolean
 }
 
-export function ChatInput({ onSendMessage }: ChatInputProps) {
+export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
   const [message, setMessage] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(true)
 
@@ -24,7 +25,7 @@ export function ChatInput({ onSendMessage }: ChatInputProps) {
   ]
 
   const handleSend = () => {
-    if (message.trim()) {
+    if (message.trim() && !disabled) {
       onSendMessage(message.trim())
       setMessage('')
       setShowSuggestions(false)
@@ -32,32 +33,36 @@ export function ChatInput({ onSendMessage }: ChatInputProps) {
   }
 
   const handleSuggestionClick = (suggestion: string) => {
-    onSendMessage(suggestion)
-    setShowSuggestions(false)
+    if (!disabled) {
+      onSendMessage(suggestion)
+      setShowSuggestions(false)
+    }
   }
 
   const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !disabled) {
       e.preventDefault()
       handleSend()
     }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value)
-    if (e.target.value.length === 0) {
-      setShowSuggestions(true)
-    } else {
-      setShowSuggestions(false)
+    if (!disabled) {
+      setMessage(e.target.value)
+      if (e.target.value.length === 0) {
+        setShowSuggestions(true)
+      } else {
+        setShowSuggestions(false)
+      }
     }
   }
 
   return (
-    <div className="border-t border-gray-200 bg-gradient-to-r from-gray-50 to-white p-4">
+    <div className={`border-t border-gray-200 bg-gradient-to-r from-gray-50 to-white p-4 ${disabled ? 'opacity-60' : ''}`}>
       <div className="max-w-4xl mx-auto space-y-4">
         {/* Suggestions */}
         <AnimatePresence>
-          {showSuggestions && message.length === 0 && (
+          {showSuggestions && message.length === 0 && !disabled && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -77,7 +82,8 @@ export function ChatInput({ onSendMessage }: ChatInputProps) {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => handleSuggestionClick(suggestion.text)}
-                    className={`p-3 rounded-xl bg-gradient-to-r ${suggestion.color} text-white text-sm font-medium shadow-md hover:shadow-lg transition-all duration-200 flex items-center space-x-2`}
+                    disabled={disabled}
+                    className={`p-3 rounded-xl bg-gradient-to-r ${suggestion.color} text-white text-sm font-medium shadow-md hover:shadow-lg transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     <span className="text-lg">{suggestion.icon}</span>
                     <span className="truncate">{suggestion.text}</span>
@@ -91,11 +97,12 @@ export function ChatInput({ onSendMessage }: ChatInputProps) {
         {/* Input area */}
         <div className="flex items-end space-x-3">
           {/* Attachment button */}
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+          <motion.div whileHover={{ scale: disabled ? 1 : 1.1 }} whileTap={{ scale: disabled ? 1 : 0.9 }}>
             <Button
               variant="ghost"
               size="sm"
-              className="p-3 text-gray-500 hover:text-purple-600 hover:bg-purple-50 mb-2 rounded-full"
+              disabled={disabled}
+              className="p-3 text-gray-500 hover:text-purple-600 hover:bg-purple-50 mb-2 rounded-full disabled:opacity-50"
             >
               <Paperclip className="w-5 h-5" />
             </Button>
@@ -108,21 +115,23 @@ export function ChatInput({ onSendMessage }: ChatInputProps) {
                 value={message}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask me about music recommendations, genres, moods, or anything music-related..."
-                className="min-h-[52px] max-h-32 resize-none border-2 border-gray-200 focus:border-purple-400 focus:ring-purple-400 pr-16 rounded-2xl bg-white shadow-sm"
+                disabled={disabled}
+                placeholder={disabled ? "Reconnecting to music services..." : "Ask me about music recommendations, genres, moods, or anything music-related..."}
+                className="min-h-[52px] max-h-32 resize-none border-2 border-gray-200 focus:border-purple-400 focus:ring-purple-400 pr-16 rounded-2xl bg-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 rows={1}
               />
               
               {/* Voice input button */}
               <motion.div 
                 className="absolute right-3 bottom-3"
-                whileHover={{ scale: 1.1 }} 
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: disabled ? 1 : 1.1 }} 
+                whileTap={{ scale: disabled ? 1 : 0.9 }}
               >
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-full"
+                  disabled={disabled}
+                  className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-full disabled:opacity-50"
                 >
                   <Mic className="w-4 h-4" />
                 </Button>
@@ -130,7 +139,7 @@ export function ChatInput({ onSendMessage }: ChatInputProps) {
             </div>
             
             {/* Character count */}
-            {message.length > 0 && (
+            {message.length > 0 && !disabled && (
               <div className="text-xs text-gray-400 mt-1 text-right">
                 {message.length}/500
               </div>
@@ -139,12 +148,12 @@ export function ChatInput({ onSendMessage }: ChatInputProps) {
           
           {/* Send button */}
           <motion.div 
-            whileHover={{ scale: 1.05 }} 
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: disabled ? 1 : 1.05 }} 
+            whileTap={{ scale: disabled ? 1 : 0.95 }}
           >
             <Button
               onClick={handleSend}
-              disabled={!message.trim()}
+              disabled={!message.trim() || disabled}
               className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white p-3 mb-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
               <Send className="w-5 h-5" />
@@ -173,7 +182,7 @@ export function ChatInput({ onSendMessage }: ChatInputProps) {
             </div>
           </div>
           <p className="text-xs text-gray-400">
-            MoodTune AI understands your emotions and musical preferences to create the perfect soundtrack for any moment.
+            {disabled ? "Reconnecting to provide you with the best music recommendations..." : "MoodTune AI understands your emotions and musical preferences to create the perfect soundtrack for any moment."}
           </p>
         </div>
       </div>

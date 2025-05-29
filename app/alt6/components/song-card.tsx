@@ -1,11 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Play, Heart, ExternalLink, Clock, Star, TrendingUp } from 'lucide-react'
+import { Play, Heart, ExternalLink, Clock, Star, TrendingUp, Pause } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 interface Song {
   id: string
@@ -16,6 +17,8 @@ interface Song {
   genre: string
   mood: string
   spotifyUrl?: string
+  image?: string
+  energy?: number
 }
 
 interface SongCardProps {
@@ -42,6 +45,28 @@ export function SongCard({ song }: SongCardProps) {
 
   const getRandomRating = () => (4.1 + Math.random() * 0.8).toFixed(1)
 
+  const handleLike = () => {
+    setIsLiked(!isLiked)
+    toast.success(isLiked ? 'Removed from favorites' : 'Added to favorites')
+  }
+
+  const handlePlay = () => {
+    setIsPlaying(!isPlaying)
+    toast.success(isPlaying ? 'Paused' : `Now playing: ${song.title}`)
+  }
+
+  const handleSpotifyOpen = () => {
+    if (song.spotifyUrl) {
+      window.open(song.spotifyUrl, '_blank')
+      toast.success('Opening in Spotify...')
+    } else {
+      // Search for the song on Spotify
+      const searchQuery = encodeURIComponent(`${song.title} ${song.artist}`)
+      window.open(`https://open.spotify.com/search/${searchQuery}`, '_blank')
+      toast.success('Searching on Spotify...')
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -58,11 +83,29 @@ export function SongCard({ song }: SongCardProps) {
         <div className="relative flex items-center space-x-4">
           {/* Enhanced Album Art */}
           <motion.div 
-            className={`w-16 h-16 bg-gradient-to-br ${getMoodColor(song.mood)} rounded-xl flex items-center justify-center flex-shrink-0 relative shadow-lg`}
+            className={`w-16 h-16 bg-gradient-to-br ${getMoodColor(song.mood)} rounded-xl flex items-center justify-center flex-shrink-0 relative shadow-lg overflow-hidden`}
             whileHover={{ rotate: 5 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Play className="w-6 h-6 text-white" />
+            {song.image ? (
+              <img 
+                src={song.image} 
+                alt={`${song.title} album art`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Play className="w-6 h-6 text-white" />
+            )}
+            
+            {/* Play overlay */}
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+              {isPlaying ? (
+                <Pause className="w-5 h-5 text-white" />
+              ) : (
+                <Play className="w-5 h-5 text-white" />
+              )}
+            </div>
+            
             {isPlaying && (
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
@@ -70,10 +113,13 @@ export function SongCard({ song }: SongCardProps) {
                 className="absolute inset-0 border-2 border-white rounded-xl"
               />
             )}
-            {/* Trending indicator */}
-            <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-              <TrendingUp className="w-2.5 h-2.5 text-white" />
-            </div>
+            
+            {/* Energy indicator */}
+            {song.energy && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                <span className="text-xs text-white font-bold">{song.energy}</span>
+              </div>
+            )}
           </motion.div>
           
           {/* Song Info */}
@@ -115,7 +161,7 @@ export function SongCard({ song }: SongCardProps) {
                 className={`p-2 h-8 w-8 transition-colors ${
                   isLiked ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500'
                 }`}
-                onClick={() => setIsLiked(!isLiked)}
+                onClick={handleLike}
               >
                 <Heart className={`w-4 h-4 ${isLiked ? 'fill-red-500' : ''}`} />
               </Button>
@@ -125,7 +171,8 @@ export function SongCard({ song }: SongCardProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="p-2 h-8 w-8 text-gray-400 hover:text-blue-500"
+                className="p-2 h-8 w-8 text-gray-400 hover:text-green-500"
+                onClick={handleSpotifyOpen}
               >
                 <ExternalLink className="w-4 h-4" />
               </Button>
@@ -135,10 +182,19 @@ export function SongCard({ song }: SongCardProps) {
               <Button
                 size="sm"
                 className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-4 py-2 h-9 shadow-lg"
-                onClick={() => setIsPlaying(!isPlaying)}
+                onClick={handlePlay}
               >
-                <Play className="w-3 h-3 mr-1" />
-                {isPlaying ? 'Playing' : 'Play'}
+                {isPlaying ? (
+                  <>
+                    <Pause className="w-3 h-3 mr-1" />
+                    Playing
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3 h-3 mr-1" />
+                    Play
+                  </>
+                )}
               </Button>
             </motion.div>
           </div>

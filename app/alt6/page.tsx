@@ -5,14 +5,21 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChatInterface } from './components/chat-interface'
 import { ChatHeader } from './components/chat-header'
 import { ChatInput } from './components/chat-input'
+import { toast, Toaster } from 'sonner'
 
-interface Message {
+interface ApiSong {
   id: string
-  type: 'user' | 'assistant'
-  content: string
-  timestamp: Date
-  isTyping?: boolean
-  songs?: Song[]
+  title: string
+  artist: string
+  album: string
+  duration: string
+  genre: string
+  mood: string
+  image: string
+  energy: number
+  danceability: number
+  valence: number
+  spotifyUrl?: string
 }
 
 interface Song {
@@ -24,7 +31,33 @@ interface Song {
   genre: string
   mood: string
   spotifyUrl?: string
+  image?: string
+  energy?: number
 }
+
+interface Message {
+  id: string
+  type: 'user' | 'assistant'
+  content: string
+  timestamp: Date
+  isTyping?: boolean
+  songs?: Song[]
+  error?: boolean
+}
+
+// Transform API song data to component format
+const transformApiSong = (apiSong: ApiSong): Song => ({
+  id: apiSong.id,
+  title: apiSong.title,
+  artist: apiSong.artist,
+  album: apiSong.album,
+  duration: apiSong.duration,
+  genre: apiSong.genre,
+  mood: apiSong.mood,
+  spotifyUrl: apiSong.spotifyUrl,
+  image: apiSong.image,
+  energy: Math.round(apiSong.energy * 100)
+})
 
 export default function Alt6Page() {
   const [messages, setMessages] = useState<Message[]>([
@@ -36,6 +69,7 @@ export default function Alt6Page() {
     }
   ])
   const [isTyping, setIsTyping] = useState(false)
+  const [isConnected, setIsConnected] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -45,6 +79,42 @@ export default function Alt6Page() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  const detectMoodFromInput = (input: string): string => {
+    const lowerInput = input.toLowerCase()
+    
+    if (lowerInput.includes('happy') || lowerInput.includes('upbeat') || lowerInput.includes('energetic') || lowerInput.includes('joy') || lowerInput.includes('excited')) {
+      return 'happy'
+    } else if (lowerInput.includes('sad') || lowerInput.includes('melancholy') || lowerInput.includes('emotional') || lowerInput.includes('cry') || lowerInput.includes('down') || lowerInput.includes('depressed')) {
+      return 'sad'
+    } else if (lowerInput.includes('chill') || lowerInput.includes('relax') || lowerInput.includes('calm') || lowerInput.includes('peaceful') || lowerInput.includes('study') || lowerInput.includes('focus')) {
+      return 'chill'
+    } else if (lowerInput.includes('workout') || lowerInput.includes('gym') || lowerInput.includes('exercise') || lowerInput.includes('run') || lowerInput.includes('fitness') || lowerInput.includes('pump')) {
+      return 'energetic'
+    } else if (lowerInput.includes('rock') || lowerInput.includes('metal') || lowerInput.includes('guitar') || lowerInput.includes('headbang')) {
+      return 'rock'
+    } else if (lowerInput.includes('jazz') || lowerInput.includes('smooth') || lowerInput.includes('sophisticated') || lowerInput.includes('classy')) {
+      return 'jazz'
+    } else if (lowerInput.includes('love') || lowerInput.includes('romantic') || lowerInput.includes('date') || lowerInput.includes('valentine')) {
+      return 'romantic'
+    }
+    
+    return 'mixed' // Default for general requests
+  }
+
+  const generatePersonaFromMood = (mood: string): string => {
+    const personas = {
+      happy: 'energy-booster',
+      sad: 'soul-healer',
+      chill: 'vibe-curator',
+      energetic: 'energy-booster',
+      rock: 'explorer',
+      jazz: 'vibe-curator',
+      romantic: 'soul-healer',
+      mixed: 'explorer'
+    }
+    return personas[mood as keyof typeof personas] || 'explorer'
+  }
 
   const handleSendMessage = async (content: string) => {
     const userMessage: Message = {
@@ -57,128 +127,134 @@ export default function Alt6Page() {
     setMessages(prev => [...prev, userMessage])
     setIsTyping(true)
 
-    // Simulate AI response delay with more realistic timing
-    setTimeout(() => {
-      const aiResponse = generateAIResponse(content)
-      setMessages(prev => [...prev, aiResponse])
+    try {
+      // Detect mood and generate persona from user input
+      const detectedMood = detectMoodFromInput(content)
+      const persona = generatePersonaFromMood(detectedMood)
+
+      // Call the music API
+      const response = await fetch('/api/music', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mood: content, // Send the full user input as mood
+          persona: persona,
+          preferences: []
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Transform API songs to component format
+        const transformedSongs = (data.songs || []).map(transformApiSong)
+        
+        const aiResponse: Message = {
+          id: (Date.now() + 1).toString(),
+          type: 'assistant',
+          content: data.message || generateContextualResponse(detectedMood),
+          timestamp: new Date(),
+          songs: transformedSongs
+        }
+
+        setMessages(prev => [...prev, aiResponse])
+        toast.success('Found some great music for you!')
+      } else {
+        throw new Error(data.error || 'Failed to get music recommendations')
+      }
+    } catch (error) {
+      console.error('API Error:', error)
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: "I'm having trouble connecting to my music database right now. 😅 But don't worry! Let me try again in a moment, or you can rephrase your request and I'll do my best to help you discover some amazing music! 🎵",
+        timestamp: new Date(),
+        error: true
+      }
+
+      setMessages(prev => [...prev, errorMessage])
+      toast.error('Failed to get recommendations. Please try again!')
+      setIsConnected(false)
+      
+      // Retry connection after 3 seconds
+      setTimeout(() => setIsConnected(true), 3000)
+    } finally {
       setIsTyping(false)
-    }, 1200 + Math.random() * 800)
+    }
   }
 
-  const generateAIResponse = (userInput: string): Message => {
-    const input = userInput.toLowerCase()
+  const generateContextualResponse = (mood: string): string => {
+    const responses = {
+      happy: "🌟 I can feel those amazing positive vibes! Here are some absolutely fantastic upbeat tracks that'll keep your energy soaring and put the biggest smile on your face. These songs are scientifically proven mood boosters! ✨",
+      sad: "💙 I hear you, and it's completely okay to feel this way. Music can be incredibly healing during tough times. Here are some beautiful, soul-touching tracks that might resonate with your current emotions. Sometimes we need to feel our feelings, and these songs will be there with you. 🤗",
+      chill: "🧘‍♀️ Perfect choice for some zen time! Here are some incredibly soothing, atmospheric tracks that'll help you unwind and find your inner peace. These are perfect for creating that perfect chill ambiance. 🌙",
+      energetic: "💪 TIME TO GET PUMPED! Here's your ultimate high-energy playlist that'll push you to crush those goals! These tracks are guaranteed to get your adrenaline pumping and keep you motivated! 🔥",
+      rock: "🤘 ROCK ON! I love your energy! Here are some absolutely legendary rock anthems with mind-blowing guitar work that'll make you want to air guitar like nobody's watching. Get ready to feel the power! ⚡",
+      jazz: "🎷 Ah, a person of refined taste! Here are some absolutely timeless jazz classics that'll transport you to a smoky jazz club. These sophisticated melodies are pure musical poetry. So smooth! ✨",
+      romantic: "💕 Aww, love is in the air! Here are some absolutely swoon-worthy romantic tracks perfect for setting the mood. Whether it's a special date night or just celebrating love, these songs will make hearts flutter! 🌹",
+      mixed: "🎶 Great question! I'd love to help you discover some amazing music! Based on your message, here are some fantastic tracks across different genres that I think you'll absolutely love. Each one has its own unique vibe and story to tell! ✨"
+    }
     
-    // Enhanced mock song recommendations with more variety
-    const songDatabase = {
-      happy: [
-        { id: '1', title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', duration: '3:20', genre: 'Pop', mood: 'Energetic' },
-        { id: '2', title: 'Watermelon Sugar', artist: 'Harry Styles', album: 'Fine Line', duration: '2:54', genre: 'Pop', mood: 'Happy' },
-        { id: '3', title: 'Levitating', artist: 'Dua Lipa', album: 'Future Nostalgia', duration: '3:23', genre: 'Pop', mood: 'Energetic' },
-        { id: '4', title: 'Good 4 U', artist: 'Olivia Rodrigo', album: 'SOUR', duration: '2:58', genre: 'Pop Rock', mood: 'Confident' },
-        { id: '5', title: 'Can\'t Stop the Feeling!', artist: 'Justin Timberlake', album: 'Trolls Soundtrack', duration: '3:56', genre: 'Pop', mood: 'Happy' }
-      ],
-      sad: [
-        { id: '6', title: 'Someone Like You', artist: 'Adele', album: '21', duration: '4:45', genre: 'Pop Ballad', mood: 'Melancholic' },
-        { id: '7', title: 'Hurt', artist: 'Johnny Cash', album: 'American IV', duration: '3:38', genre: 'Country', mood: 'Melancholic' },
-        { id: '8', title: 'Mad World', artist: 'Gary Jules', album: 'Trading Snakeoil for Wolftickets', duration: '3:07', genre: 'Alternative', mood: 'Melancholic' },
-        { id: '9', title: 'The Night We Met', artist: 'Lord Huron', album: 'Strange Trails', duration: '3:28', genre: 'Indie Folk', mood: 'Melancholic' },
-        { id: '10', title: 'Skinny Love', artist: 'Bon Iver', album: 'For Emma, Forever Ago', duration: '3:58', genre: 'Indie Folk', mood: 'Melancholic' }
-      ],
-      rock: [
-        { id: '11', title: 'Bohemian Rhapsody', artist: 'Queen', album: 'A Night at the Opera', duration: '5:55', genre: 'Rock', mood: 'Epic' },
-        { id: '12', title: 'Stairway to Heaven', artist: 'Led Zeppelin', album: 'Led Zeppelin IV', duration: '8:02', genre: 'Rock', mood: 'Epic' },
-        { id: '13', title: 'Sweet Child O\' Mine', artist: 'Guns N\' Roses', album: 'Appetite for Destruction', duration: '5:03', genre: 'Rock', mood: 'Energetic' },
-        { id: '14', title: 'Don\'t Stop Believin\'', artist: 'Journey', album: 'Escape', duration: '4:10', genre: 'Rock', mood: 'Motivational' },
-        { id: '15', title: 'We Will Rock You', artist: 'Queen', album: 'News of the World', duration: '2:02', genre: 'Rock', mood: 'Confident' }
-      ],
-      chill: [
-        { id: '16', title: 'Weightless', artist: 'Marconi Union', album: 'Weightless', duration: '8:08', genre: 'Ambient', mood: 'Chill' },
-        { id: '17', title: 'River', artist: 'Leon Bridges', album: 'Coming Home', duration: '3:42', genre: 'Soul', mood: 'Chill' },
-        { id: '18', title: 'Holocene', artist: 'Bon Iver', album: 'Bon Iver, Bon Iver', duration: '5:36', genre: 'Indie Folk', mood: 'Chill' },
-        { id: '19', title: 'Breathe Me', artist: 'Sia', album: 'Colour the Small One', duration: '4:31', genre: 'Alternative', mood: 'Chill' },
-        { id: '20', title: 'Teardrop', artist: 'Massive Attack', album: 'Mezzanine', duration: '5:29', genre: 'Trip Hop', mood: 'Chill' }
-      ],
-      workout: [
-        { id: '21', title: 'Till I Collapse', artist: 'Eminem', album: 'The Eminem Show', duration: '4:57', genre: 'Hip Hop', mood: 'Energetic' },
-        { id: '22', title: 'Eye of the Tiger', artist: 'Survivor', album: 'Eye of the Tiger', duration: '4:04', genre: 'Rock', mood: 'Motivational' },
-        { id: '23', title: 'Stronger', artist: 'Kanye West', album: 'Graduation', duration: '5:11', genre: 'Hip Hop', mood: 'Confident' },
-        { id: '24', title: 'Thunder', artist: 'Imagine Dragons', album: 'Evolve', duration: '3:07', genre: 'Pop Rock', mood: 'Energetic' },
-        { id: '25', title: 'Pump It', artist: 'The Black Eyed Peas', album: 'Monkey Business', duration: '3:33', genre: 'Hip Hop', mood: 'Energetic' }
-      ],
-      jazz: [
-        { id: '26', title: 'Take Five', artist: 'Dave Brubeck Quartet', album: 'Time Out', duration: '5:24', genre: 'Jazz', mood: 'Chill' },
-        { id: '27', title: 'Fly Me to the Moon', artist: 'Frank Sinatra', album: 'It Might as Well Be Swing', duration: '2:29', genre: 'Jazz', mood: 'Romantic' },
-        { id: '28', title: 'What a Wonderful World', artist: 'Louis Armstrong', album: 'What a Wonderful World', duration: '2:21', genre: 'Jazz', mood: 'Happy' },
-        { id: '29', title: 'Summertime', artist: 'Ella Fitzgerald', album: 'Porgy and Bess', duration: '4:18', genre: 'Jazz', mood: 'Chill' },
-        { id: '30', title: 'Blue in Green', artist: 'Miles Davis', album: 'Kind of Blue', duration: '5:37', genre: 'Jazz', mood: 'Chill' }
-      ]
-    }
-
-    let response = ""
-    let songs: Song[] = []
-    let emoji = "🎵"
-
-    if (input.includes('happy') || input.includes('upbeat') || input.includes('energetic') || input.includes('joy')) {
-      emoji = "😊"
-      response = `${emoji} Awesome! I can feel those positive vibes! Here are some absolutely fantastic upbeat tracks that'll keep your energy soaring and put the biggest smile on your face. These songs are scientifically proven mood boosters! ✨`
-      songs = songDatabase.happy.slice(0, 4)
-    } else if (input.includes('sad') || input.includes('melancholy') || input.includes('emotional') || input.includes('cry') || input.includes('down')) {
-      emoji = "💙"
-      response = `${emoji} I hear you, and it's completely okay to feel this way. Music can be incredibly healing during tough times. Here are some beautiful, soul-touching tracks that might resonate with your current emotions. Sometimes we need to feel our feelings, and these songs will be there with you. 🤗`
-      songs = songDatabase.sad.slice(0, 4)
-    } else if (input.includes('rock') || input.includes('guitar') || input.includes('metal') || input.includes('headbang')) {
-      emoji = "🤘"
-      response = `${emoji} ROCK ON! I love your energy! Here are some absolutely legendary rock anthems with mind-blowing guitar work that'll make you want to air guitar like nobody's watching. Get ready to feel the power! ⚡`
-      songs = songDatabase.rock.slice(0, 4)
-    } else if (input.includes('chill') || input.includes('relax') || input.includes('calm') || input.includes('study') || input.includes('focus')) {
-      emoji = "🧘‍♀️"
-      response = `${emoji} Perfect choice for some zen time! Here are some incredibly soothing, atmospheric tracks that'll help you unwind and find your inner peace. These are perfect for creating that perfect chill ambiance. 🌙`
-      songs = songDatabase.chill.slice(0, 4)
-    } else if (input.includes('workout') || input.includes('gym') || input.includes('exercise') || input.includes('run') || input.includes('fitness')) {
-      emoji = "💪"
-      response = `${emoji} TIME TO GET PUMPED! Here's your ultimate high-energy workout playlist that'll push you to crush those fitness goals! These tracks are guaranteed to get your adrenaline pumping and keep you motivated! 🔥`
-      songs = songDatabase.workout.slice(0, 4)
-    } else if (input.includes('jazz') || input.includes('smooth') || input.includes('sophisticated') || input.includes('classy')) {
-      emoji = "🎷"
-      response = `${emoji} Ah, a person of refined taste! Here are some absolutely timeless jazz classics that'll transport you to a smoky jazz club. These sophisticated melodies are pure musical poetry. So smooth! ✨`
-      songs = songDatabase.jazz.slice(0, 4)
-    } else if (input.includes('love') || input.includes('romantic') || input.includes('date') || input.includes('valentine')) {
-      emoji = "💕"
-      response = `${emoji} Aww, love is in the air! Here are some absolutely swoon-worthy romantic tracks perfect for setting the mood. Whether it's a special date night or just celebrating love, these songs will make hearts flutter! 🌹`
-      songs = [
-        { id: '31', title: 'Perfect', artist: 'Ed Sheeran', album: '÷ (Divide)', duration: '4:23', genre: 'Pop', mood: 'Romantic' },
-        { id: '32', title: 'All of Me', artist: 'John Legend', album: 'Love in the Future', duration: '4:29', genre: 'R&B', mood: 'Romantic' },
-        { id: '33', title: 'Thinking Out Loud', artist: 'Ed Sheeran', album: 'x (Multiply)', duration: '4:41', genre: 'Pop', mood: 'Romantic' },
-        { id: '34', title: 'Make You Feel My Love', artist: 'Adele', album: '19', duration: '3:32', genre: 'Pop Ballad', mood: 'Romantic' }
-      ]
-    } else {
-      emoji = "🎶"
-      response = `${emoji} Great question! I'd love to help you discover some amazing music! Based on your message, here are some popular tracks across different genres that I think you'll absolutely love. Each one has its own unique vibe and story to tell! ✨`
-      songs = [...songDatabase.happy.slice(0, 2), ...songDatabase.rock.slice(0, 2)]
-    }
-
-    return {
-      id: Date.now().toString(),
-      type: 'assistant',
-      content: response,
-      timestamp: new Date(),
-      songs: songs.length > 0 ? songs : undefined
-    }
+    return responses[mood as keyof typeof responses] || responses.mixed
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col">
-      <ChatHeader />
-      
-      <div className="flex-1 overflow-hidden">
-        <ChatInterface 
-          messages={messages} 
-          isTyping={isTyping}
-          messagesEndRef={messagesEndRef}
+    <div className="h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex flex-col relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-gradient-to-r from-indigo-400/15 to-pink-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
+      {/* Connection Status */}
+      {!isConnected && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-yellow-500/20 border-b border-yellow-500/30 p-2 text-center"
+        >
+          <p className="text-yellow-800 text-sm">
+            🔄 Reconnecting to music services...
+          </p>
+        </motion.div>
+      )}
+
+      <div className="relative z-10 flex flex-col h-full">
+        <ChatHeader />
+        
+        <div className="flex-1 overflow-hidden">
+          <ChatInterface 
+            messages={messages} 
+            isTyping={isTyping}
+            messagesEndRef={messagesEndRef}
+          />
+        </div>
+        
+        <ChatInput 
+          onSendMessage={handleSendMessage} 
+          disabled={!isConnected}
         />
       </div>
-      
-      <ChatInput onSendMessage={handleSendMessage} />
+
+      {/* Toast Notifications */}
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            color: '#1f2937',
+          },
+        }}
+      />
     </div>
   )
 } 
