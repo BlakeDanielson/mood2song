@@ -4,9 +4,9 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { SonnerProvider } from "@/components/sonner-provider"
-import { Sidebar as AppSidebar } from "@/components/sidebar"
 import { Analytics } from "@vercel/analytics/react"
-
+import Script from "next/script"
+import { LayoutWrapper } from "@/components/layout-wrapper"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -24,15 +24,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5415010136926818"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <ThemeProvider attribute="class" defaultTheme="dark">
-          <div className="flex min-h-screen">
-            <div className="fixed h-screen w-64 border-r dark:border-neutral-800 p-4 flex-shrink-0 hidden md:block">
-              <AppSidebar />
-            </div>
-            <main className="flex-1 overflow-y-auto pl-4 pr-4 md:pl-72 md:pr-10">
-              {children}
-            </main>
-          </div>
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
           <SonnerProvider />
         </ThemeProvider>
         <Analytics />

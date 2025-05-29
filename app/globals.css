@@ -61,6 +61,20 @@ body {
   }
 }
 
+/* Animation for RetroGrid */
+@keyframes grid {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animate-grid {
+  animation: grid 15s linear infinite;
+}
+
 /* Spotify-inspired custom classes */
 .spotify-container {
   display: grid;
@@ -127,4 +141,18 @@ body {
   outline: none;
   box-shadow: none;
   border: 1px solid #535353;
+}
+
+.spotify-outline-button {
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid #535353;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.spotify-outline-button:hover {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
 }

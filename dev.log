@@ -1,0 +1,87 @@
+
+> my-v0-project@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.2.4
+   - Local:        http://localhost:3000
+   - Network:      http://10.0.0.59:3000
+
+ ✓ Starting...
+ ✓ Ready in 2.3s
+ ○ Compiling /alt7 ...
+ ✓ Compiled /alt7 in 2.1s (1984 modules)
+ GET /alt7 200 in 2386ms
+ ✓ Compiled in 442ms (853 modules)
+ ✓ Compiled in 619ms (1984 modules)
+ ✓ Compiled in 1538ms (2758 modules)
+ ✓ Compiled in 967ms (1239 modules)
+ ✓ Compiled in 400ms (1239 modules)
+ ✓ Compiled in 810ms (1239 modules)
+ ✓ Compiled /alt7 in 293ms (1517 modules)
+ GET /alt7 200 in 661ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1415ms (2361 modules)
+ GET / 200 in 1909ms
+ GET / 200 in 120ms
+ GET / 200 in 80ms
+ ○ Compiling /alt7 ...
+ ✓ Compiled /alt7 in 841ms (1528 modules)
+ GET /alt7 200 in 2025ms
+Using Mood Prompt for: watching westworld and loving it
+Selected Persona ID for request: undefined
+Current Mood: watching westworld and loving it
+Applied Filters: {
+  genre: '',
+  era: '',
+  popularity: '',
+  language: '',
+  excludeMainstream: false
+}
+--- Sending Prompt to AI ---
+Based on the mood "watching westworld and loving it", Recommend 10 *new* and *different* song recommendations.Do not recommend more than 1 song by the same artist. Aim for diversity and include at least one lesser-known artist.Explain briefly why each song matches the "watching westworld and loving it" mood.
+    For each song, provide: title, artist, reason (explaining the connection), year, genre.
+    Format your response as a JSON object containing ONLY a 'songs' array (with title, artist, album, reason, year, genre properties). Ensure the JSON is valid.
+  
+-----------------------------
+Error in findSongs processing: Error [AI_LoadAPIKeyError]: OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable.
+    at async findSongs (app/actions.ts:306:21)
+  304 |     
+  305 |     // Use the enhanced prompt for the API call
+> 306 |     const { text } = await generateText({
+      |                     ^
+  307 |       // model: openai("gpt-4.1"), // Consider gpt-4o or a newer model if available/preferred
+  308 |       model: openai("gpt-4o"),
+  309 |       prompt: securePrompt, // Use the secure prompt with system message prepended {
+  cause: undefined
+}
+ POST /alt7 200 in 734ms
+Using Mood Prompt for: watching westworld and loving it
+Selected Persona ID for request: undefined
+Current Mood: watching westworld and loving it
+Applied Filters: {
+  genre: '',
+  era: '',
+  popularity: '',
+  language: '',
+  excludeMainstream: false
+}
+--- Sending Prompt to AI ---
+Based on the mood "watching westworld and loving it", Recommend 10 *new* and *different* song recommendations.Do not recommend more than 1 song by the same artist. Aim for diversity and include at least one lesser-known artist.Explain briefly why each song matches the "watching westworld and loving it" mood.
+    For each song, provide: title, artist, reason (explaining the connection), year, genre.
+    Format your response as a JSON object containing ONLY a 'songs' array (with title, artist, album, reason, year, genre properties). Ensure the JSON is valid.
+  
+-----------------------------
+Error in findSongs processing: Error [AI_LoadAPIKeyError]: OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable.
+    at async findSongs (app/actions.ts:306:21)
+  304 |     
+  305 |     // Use the enhanced prompt for the API call
+> 306 |     const { text } = await generateText({
+      |                     ^
+  307 |       // model: openai("gpt-4.1"), // Consider gpt-4o or a newer model if available/preferred
+  308 |       model: openai("gpt-4o"),
+  309 |       prompt: securePrompt, // Use the secure prompt with system message prepended {
+  cause: undefined
+}
+ POST /alt7 200 in 218ms
+ ✓ Compiled /_not-found in 471ms (2765 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 581ms

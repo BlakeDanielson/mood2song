@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { motion } from "motion/react"
 
 interface MoodFiltersProps {
   filters: {
@@ -31,10 +32,16 @@ export function MoodFilters({
   }
 
   return (
-    <div className="mt-4 p-4 bg-[#282828] rounded-md">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="space-y-2">
-          <Label htmlFor="genre" className="text-sm text-muted-foreground">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="p-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl"
+    >
+      <h3 className="text-xl font-bold text-white mb-6 text-center">Fine-tune Your Discovery</h3>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="space-y-3">
+          <Label htmlFor="genre" className="text-sm font-medium text-gray-300">
             Genre
           </Label>
           <Select 
@@ -44,30 +51,30 @@ export function MoodFilters({
           >
             <SelectTrigger 
               id="genre" 
-              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed rounded-xl h-12"
             >
               <SelectValue placeholder="Any genre" />
             </SelectTrigger>
-            <SelectContent className="bg-[#333333] text-white border-[#444444]">
-              <SelectItem value="any">Any genre</SelectItem>
-              <SelectItem value="rock">Rock</SelectItem>
-              <SelectItem value="pop">Pop</SelectItem>
-              <SelectItem value="hip-hop">Hip-Hop</SelectItem>
-              <SelectItem value="r&b">R&B</SelectItem>
-              <SelectItem value="jazz">Jazz</SelectItem>
-              <SelectItem value="electronic">Electronic</SelectItem>
-              <SelectItem value="classical">Classical</SelectItem>
-              <SelectItem value="folk">Folk</SelectItem>
-              <SelectItem value="indie">Indie</SelectItem>
-              <SelectItem value="metal">Metal</SelectItem>
-              <SelectItem value="country">Country</SelectItem>
-              <SelectItem value="ambient">Ambient</SelectItem>
+            <SelectContent className="bg-black/90 backdrop-blur-md text-white border border-white/20 rounded-xl">
+              <SelectItem value="any" className="hover:bg-white/10 focus:bg-white/10">Any genre</SelectItem>
+              <SelectItem value="rock" className="hover:bg-white/10 focus:bg-white/10">Rock</SelectItem>
+              <SelectItem value="pop" className="hover:bg-white/10 focus:bg-white/10">Pop</SelectItem>
+              <SelectItem value="hip-hop" className="hover:bg-white/10 focus:bg-white/10">Hip-Hop</SelectItem>
+              <SelectItem value="r&b" className="hover:bg-white/10 focus:bg-white/10">R&B</SelectItem>
+              <SelectItem value="jazz" className="hover:bg-white/10 focus:bg-white/10">Jazz</SelectItem>
+              <SelectItem value="electronic" className="hover:bg-white/10 focus:bg-white/10">Electronic</SelectItem>
+              <SelectItem value="classical" className="hover:bg-white/10 focus:bg-white/10">Classical</SelectItem>
+              <SelectItem value="folk" className="hover:bg-white/10 focus:bg-white/10">Folk</SelectItem>
+              <SelectItem value="indie" className="hover:bg-white/10 focus:bg-white/10">Indie</SelectItem>
+              <SelectItem value="metal" className="hover:bg-white/10 focus:bg-white/10">Metal</SelectItem>
+              <SelectItem value="country" className="hover:bg-white/10 focus:bg-white/10">Country</SelectItem>
+              <SelectItem value="ambient" className="hover:bg-white/10 focus:bg-white/10">Ambient</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="era" className="text-sm text-muted-foreground">
+        <div className="space-y-3">
+          <Label htmlFor="era" className="text-sm font-medium text-gray-300">
             Era
           </Label>
           <Select 
@@ -77,26 +84,26 @@ export function MoodFilters({
           >
             <SelectTrigger 
               id="era" 
-              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed rounded-xl h-12"
             >
               <SelectValue placeholder="Any era" />
             </SelectTrigger>
-            <SelectContent className="bg-[#333333] text-white border-[#444444]">
-              <SelectItem value="any">Any era</SelectItem>
-              <SelectItem value="2020s">2020s</SelectItem>
-              <SelectItem value="2010s">2010s</SelectItem>
-              <SelectItem value="2000s">2000s</SelectItem>
-              <SelectItem value="1990s">1990s</SelectItem>
-              <SelectItem value="1980s">1980s</SelectItem>
-              <SelectItem value="1970s">1970s</SelectItem>
-              <SelectItem value="1960s">1960s</SelectItem>
-              <SelectItem value="classic">Classic (pre-1960s)</SelectItem>
+            <SelectContent className="bg-black/90 backdrop-blur-md text-white border border-white/20 rounded-xl">
+              <SelectItem value="any" className="hover:bg-white/10 focus:bg-white/10">Any era</SelectItem>
+              <SelectItem value="2020s" className="hover:bg-white/10 focus:bg-white/10">2020s</SelectItem>
+              <SelectItem value="2010s" className="hover:bg-white/10 focus:bg-white/10">2010s</SelectItem>
+              <SelectItem value="2000s" className="hover:bg-white/10 focus:bg-white/10">2000s</SelectItem>
+              <SelectItem value="1990s" className="hover:bg-white/10 focus:bg-white/10">1990s</SelectItem>
+              <SelectItem value="1980s" className="hover:bg-white/10 focus:bg-white/10">1980s</SelectItem>
+              <SelectItem value="1970s" className="hover:bg-white/10 focus:bg-white/10">1970s</SelectItem>
+              <SelectItem value="1960s" className="hover:bg-white/10 focus:bg-white/10">1960s</SelectItem>
+              <SelectItem value="classic" className="hover:bg-white/10 focus:bg-white/10">Classic (pre-1960s)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="popularity" className="text-sm text-muted-foreground">
+        <div className="space-y-3">
+          <Label htmlFor="popularity" className="text-sm font-medium text-gray-300">
             Discovery Level
           </Label>
           <Select 
@@ -106,21 +113,21 @@ export function MoodFilters({
           >
             <SelectTrigger 
               id="popularity" 
-              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed rounded-xl h-12"
             >
               <SelectValue placeholder="Any popularity" />
             </SelectTrigger>
-            <SelectContent className="bg-[#333333] text-white border-[#444444]">
-              <SelectItem value="any">Any popularity</SelectItem>
-              <SelectItem value="obscure">Hidden Gems</SelectItem>
-              <SelectItem value="indie">Independent Artists</SelectItem>
-              <SelectItem value="classic">Timeless Classics</SelectItem>
+            <SelectContent className="bg-black/90 backdrop-blur-md text-white border border-white/20 rounded-xl">
+              <SelectItem value="any" className="hover:bg-white/10 focus:bg-white/10">Any popularity</SelectItem>
+              <SelectItem value="obscure" className="hover:bg-white/10 focus:bg-white/10">Hidden Gems</SelectItem>
+              <SelectItem value="indie" className="hover:bg-white/10 focus:bg-white/10">Independent Artists</SelectItem>
+              <SelectItem value="classic" className="hover:bg-white/10 focus:bg-white/10">Timeless Classics</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="language" className="text-sm text-muted-foreground">
+        <div className="space-y-3">
+          <Label htmlFor="language" className="text-sm font-medium text-gray-300">
             Language
           </Label>
           <Select 
@@ -130,23 +137,23 @@ export function MoodFilters({
           >
             <SelectTrigger 
               id="language" 
-              className="bg-[#333333] border border-[#444444] text-white hover:bg-[#3a3a3a] focus:ring-1 focus:ring-offset-0 focus:ring-[#505050] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed rounded-xl h-12"
             >
               <SelectValue placeholder="Any language" />
             </SelectTrigger>
-            <SelectContent className="bg-[#333333] text-white border-[#444444]">
-              <SelectItem value="any">Any language</SelectItem>
-              <SelectItem value="English">English</SelectItem>
-              <SelectItem value="Spanish">Spanish</SelectItem>
-              <SelectItem value="French">French</SelectItem>
-              <SelectItem value="Korean">Korean</SelectItem>
-              <SelectItem value="Japanese">Japanese</SelectItem>
-              <SelectItem value="Instrumental">Instrumental</SelectItem>
-              <SelectItem value="non-English">Non-English</SelectItem>
+            <SelectContent className="bg-black/90 backdrop-blur-md text-white border border-white/20 rounded-xl">
+              <SelectItem value="any" className="hover:bg-white/10 focus:bg-white/10">Any language</SelectItem>
+              <SelectItem value="English" className="hover:bg-white/10 focus:bg-white/10">English</SelectItem>
+              <SelectItem value="Spanish" className="hover:bg-white/10 focus:bg-white/10">Spanish</SelectItem>
+              <SelectItem value="French" className="hover:bg-white/10 focus:bg-white/10">French</SelectItem>
+              <SelectItem value="Korean" className="hover:bg-white/10 focus:bg-white/10">Korean</SelectItem>
+              <SelectItem value="Japanese" className="hover:bg-white/10 focus:bg-white/10">Japanese</SelectItem>
+              <SelectItem value="Instrumental" className="hover:bg-white/10 focus:bg-white/10">Instrumental</SelectItem>
+              <SelectItem value="non-English" className="hover:bg-white/10 focus:bg-white/10">Non-English</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

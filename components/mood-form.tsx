@@ -50,7 +50,7 @@ export function MoodForm({
 }: MoodFormProps) {
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Hide MoodPresets on small screens (mobile) */}
       <div className="hidden sm:block">
         <MoodPresets onSelectMood={onSelectMood} currentMood={currentMood} disabled={isLoading} />
