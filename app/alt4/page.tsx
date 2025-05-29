@@ -6,8 +6,38 @@ import { PremiumNavigation } from './components/premium-navigation'
 import { PremiumMoodInput } from './components/premium-mood-input'
 import { PersonaSelector } from './components/persona-selector'
 import { PlaylistResults } from './components/playlist-results'
+import { toast, Toaster } from 'sonner'
 
 type Step = 'mood' | 'persona' | 'results'
+
+interface ApiSong {
+  id: string
+  title: string
+  artist: string
+  album: string
+  duration: string
+  genre: string
+  mood: string
+  image: string
+  energy: number
+  danceability: number
+  valence: number
+  spotifyUrl?: string
+}
+
+interface Song {
+  id: string
+  title: string
+  artist: string
+  album: string
+  duration: string
+  genre: string
+  mood: string
+  energy: number
+  popularity: number
+  albumArt: string
+  previewUrl?: string
+}
 
 interface AppState {
   currentStep: Step
@@ -15,6 +45,9 @@ interface AppState {
   moodIntensity: number
   selectedPersona: string
   isLoading: boolean
+  songs: Song[]
+  error: string | null
+  apiResponse: string
 }
 
 const stepNumbers = {
@@ -23,46 +56,115 @@ const stepNumbers = {
   results: 3
 }
 
+// Transform API song data to component format
+const transformApiSong = (apiSong: ApiSong): Song => ({
+  id: apiSong.id,
+  title: apiSong.title,
+  artist: apiSong.artist,
+  album: apiSong.album,
+  duration: apiSong.duration,
+  genre: apiSong.genre,
+  mood: apiSong.mood,
+  energy: Math.round(apiSong.energy * 100),
+  popularity: Math.round((apiSong.energy + apiSong.danceability + apiSong.valence) / 3 * 100),
+  albumArt: apiSong.image,
+  previewUrl: apiSong.spotifyUrl
+})
+
 export default function Alt4Page() {
   const [state, setState] = useState<AppState>({
     currentStep: 'mood',
     mood: '',
     moodIntensity: 70,
     selectedPersona: '',
-    isLoading: false
+    isLoading: false,
+    songs: [],
+    error: null,
+    apiResponse: ''
   })
 
-  const handleMoodSubmit = (mood: string, intensity: number) => {
+  const handleMoodSubmit = async (mood: string, intensity: number) => {
     setState(prev => ({
       ...prev,
       mood,
       moodIntensity: intensity,
-      isLoading: true
+      isLoading: true,
+      error: null
     }))
 
-    setTimeout(() => {
+    try {
+      // Simulate mood analysis
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
       setState(prev => ({
         ...prev,
         currentStep: 'persona',
         isLoading: false
       }))
-    }, 1500)
+      
+      toast.success('Mood analyzed successfully! Choose your persona.')
+    } catch (error) {
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: 'Failed to analyze mood. Please try again.'
+      }))
+      toast.error('Failed to analyze mood')
+    }
   }
 
-  const handlePersonaSelect = (persona: string) => {
+  const handlePersonaSelect = async (persona: string) => {
     setState(prev => ({
       ...prev,
       selectedPersona: persona,
-      isLoading: true
+      isLoading: true,
+      error: null
     }))
 
-    setTimeout(() => {
+    try {
+      // Call the music API
+      const response = await fetch('/api/music', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mood: state.mood,
+          persona: persona,
+          preferences: []
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Transform API songs to component format
+        const transformedSongs = (data.songs || []).map(transformApiSong)
+        
+        setState(prev => ({
+          ...prev,
+          currentStep: 'results',
+          isLoading: false,
+          songs: transformedSongs,
+          apiResponse: data.message || ''
+        }))
+        toast.success('Playlist generated successfully!')
+      } else {
+        throw new Error(data.error || 'Failed to generate playlist')
+      }
+    } catch (error) {
+      console.error('API Error:', error)
       setState(prev => ({
         ...prev,
-        currentStep: 'results',
-        isLoading: false
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Failed to generate playlist. Please try again.'
       }))
-    }, 2000)
+      toast.error('Failed to generate playlist')
+    }
   }
 
   const handleStepChange = (step: number) => {
@@ -73,14 +175,30 @@ export default function Alt4Page() {
     }
     
     const newStep = stepMap[step]
-    if (newStep) {
-      setState(prev => ({ ...prev, currentStep: newStep }))
+    if (newStep && !state.isLoading) {
+      // Only allow going back to previous steps or current step
+      if (stepNumbers[newStep] <= stepNumbers[state.currentStep]) {
+        setState(prev => ({ 
+          ...prev, 
+          currentStep: newStep,
+          error: null 
+        }))
+      }
     }
   }
 
-  const canGoBack = stepNumbers[state.currentStep] > 1
+  const handleRetry = () => {
+    if (state.currentStep === 'persona' && state.selectedPersona) {
+      handlePersonaSelect(state.selectedPersona)
+    } else if (state.currentStep === 'mood' && state.mood) {
+      handleMoodSubmit(state.mood, state.moodIntensity)
+    }
+  }
+
+  const canGoBack = stepNumbers[state.currentStep] > 1 && !state.isLoading
   const canGoForward = stepNumbers[state.currentStep] < 3 && 
-    Boolean(state.currentStep === 'mood' ? state.mood : state.selectedPersona)
+    Boolean(state.currentStep === 'mood' ? state.mood : state.selectedPersona) && 
+    !state.isLoading
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
@@ -109,6 +227,28 @@ export default function Alt4Page() {
 
       <main className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="max-w-4xl mx-auto">
+          {/* Error Display */}
+          {state.error && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-2xl backdrop-blur-sm"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                  <p className="text-red-100 text-sm">{state.error}</p>
+                </div>
+                <button
+                  onClick={handleRetry}
+                  className="text-red-200 hover:text-white text-sm underline"
+                >
+                  Retry
+                </button>
+              </div>
+            </motion.div>
+          )}
+
           <AnimatePresence mode="wait">
             {state.currentStep === 'mood' && (
               <motion.div
@@ -152,8 +292,17 @@ export default function Alt4Page() {
                 transition={{ duration: 0.6, ease: "easeInOut" }}
                 className="backdrop-blur-sm bg-white/10 rounded-3xl border border-white/20 shadow-2xl p-8 md:p-12"
               >
+                {state.apiResponse && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-6 p-4 bg-green-500/20 border border-green-500/30 rounded-2xl backdrop-blur-sm"
+                  >
+                    <p className="text-green-100 text-sm">{state.apiResponse}</p>
+                  </motion.div>
+                )}
                 <PlaylistResults
-                  songs={[]}
+                  songs={state.songs}
                   mood={state.mood}
                   persona={state.selectedPersona}
                   isLoading={state.isLoading}
@@ -210,6 +359,19 @@ export default function Alt4Page() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Toast Notifications */}
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white',
+          },
+        }}
+      />
     </div>
   )
 } 
