@@ -2,18 +2,16 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { IconMusic, IconUser, IconSparkles, IconSearch } from '@tabler/icons-react'
+import { IconUser, IconSparkles, IconSearch } from '@tabler/icons-react'
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Loader2, Laptop, Truck, Guitar, Music, Info } from 'lucide-react'
+import { Loader2, Laptop, Truck, Guitar, Music } from 'lucide-react'
 import { toast } from "sonner"
 import { personas, Persona } from "@/lib/personas"
 import { findSongs } from "@/app/actions"
 import type { SongData, FindSongsSuccessResponse } from "@/app/actions"
-import { MoodForm } from "@/components/mood-form"
 import { SongRecommendations } from "@/components/song-recommendations"
 import { PersonaModal } from "@/components/persona-modal"
 
@@ -36,10 +34,8 @@ export default function Alt7Page() {
   const [error, setError] = useState<string | null>(null)
   const [lastFetchParams, setLastFetchParams] = useState<{ mood?: string, filters: any, personaId?: string | null } | null>(null)
   const [searchPerformed, setSearchPerformed] = useState(false)
-  const [showAllPersonas, setShowAllPersonas] = useState(false)
 
   const [mood, setMood] = useState("")
-  const [displayedMood, setDisplayedMood] = useState("")
   const [excludeMainstream, setExcludeMainstream] = useState(false)
   const [filters, setFilters] = useState({
     genre: "",
@@ -74,7 +70,6 @@ export default function Alt7Page() {
     }
 
     console.log("handleFindSongs fetching with:", { currentMood, currentPersonaId, currentFilters })
-    setDisplayedMood(currentMood || "")
     setLoading(true)
     setError(null)
     setSongs([])
@@ -146,24 +141,6 @@ export default function Alt7Page() {
     setSelectedPersonaForModal(null);
   };
 
-  const handleFilterChange = (newFilters: {
-    genre?: string
-    era?: string
-    popularity?: string
-    language?: string
-  }) => {
-    setFilters({
-      genre: newFilters.genre || "",
-      era: newFilters.era || "",
-      popularity: newFilters.popularity || "",
-      language: newFilters.language || "",
-    });
-  }
-
-  const handleSelectMood = (selectedMood: string) => {
-    setMood(selectedMood);
-  }
-
   const handleRefresh = () => {
       if (lastFetchParams) {
           console.log("Refreshing with last params:", lastFetchParams);
@@ -198,10 +175,10 @@ export default function Alt7Page() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-purple-900/20 to-black relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-black via-blue-900/20 to-black relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900/20 via-black to-black"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black"></div>
         {/* Floating particles */}
         {Array.from({ length: 50 }).map((_, i) => (
           <div
@@ -249,7 +226,7 @@ export default function Alt7Page() {
                   <motion.button
                     key={persona.id}
                     onClick={() => selectPersona(persona)}
-                    className={`text-left p-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl hover:bg-white/20 transition-all group ${selectedPersonaId === persona.id ? 'ring-2 ring-purple-500' : ''}`}
+                    className={`text-left p-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl hover:bg-white/20 transition-all group ${selectedPersonaId === persona.id ? 'ring-2 ring-blue-500' : ''}`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -283,7 +260,7 @@ export default function Alt7Page() {
                   <motion.button
                     key={persona.id}
                     onClick={() => selectPersona(persona)}
-                    className={`text-left p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl hover:bg-white/20 transition-all group ${selectedPersonaId === persona.id ? 'ring-2 ring-purple-500' : ''}`}
+                    className={`text-left p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl hover:bg-white/20 transition-all group ${selectedPersonaId === persona.id ? 'ring-2 ring-blue-500' : ''}`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -306,7 +283,7 @@ export default function Alt7Page() {
                             e.stopPropagation()
                             handleOpenPersonaModal(persona)
                           }}
-                          className="text-xs text-purple-400 hover:text-purple-300 p-0 h-auto"
+                          className="text-xs text-blue-400 hover:text-blue-300 p-0 h-auto"
                         >
                           Learn more →
                         </Button>
@@ -340,7 +317,7 @@ export default function Alt7Page() {
               transition={{ duration: 0.8 }}
               className="mb-8"
             >
-              <h1 className="text-6xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 mb-6">
+              <h1 className="text-6xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-500 to-blue-600 mb-6">
                 MoodTune
               </h1>
               <div className="text-2xl md:text-4xl text-white font-light">
@@ -350,7 +327,7 @@ export default function Alt7Page() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="text-purple-400 font-medium"
+                  className="text-blue-400 font-medium"
                 >
                   {moodWords[currentMoodIndex]}
                 </motion.span>
@@ -390,10 +367,10 @@ export default function Alt7Page() {
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-8"
               >
-                <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-md border border-purple-500/30 rounded-2xl">
-                  <Avatar className="h-8 w-8 border-2 border-purple-400">
+                <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 backdrop-blur-md border border-blue-500/30 rounded-2xl">
+                  <Avatar className="h-8 w-8 border-2 border-blue-400">
                     <AvatarImage src={selectedPersona.imageUrl} alt={`${selectedPersona.name} avatar`} />
-                    <AvatarFallback className="bg-purple-600 text-white text-sm">{selectedPersona.name.substring(0, 2)}</AvatarFallback>
+                    <AvatarFallback className="bg-blue-600 text-white text-sm">{selectedPersona.name.substring(0, 2)}</AvatarFallback>
                   </Avatar>
                   <span className="text-white font-medium">{selectedPersona.name}</span>
                   <IconSparkles className="h-5 w-5" />
@@ -411,7 +388,7 @@ export default function Alt7Page() {
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                 <div className="relative flex-grow">
                   <textarea
-                    className="w-full px-6 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-lg h-24 resize-none"
+                    className="w-full px-6 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg h-24 resize-none"
                     placeholder="Tell me how you're feeling or what you're doing..."
                     value={mood}
                     onChange={(e) => setMood(e.target.value)}
@@ -430,7 +407,7 @@ export default function Alt7Page() {
                     id="exclude-mainstream-toggle"
                     checked={excludeMainstream}
                     onCheckedChange={setExcludeMainstream}
-                    className="data-[state=checked]:bg-purple-500"
+                    className="data-[state=checked]:bg-blue-500"
                   />
                   <Label htmlFor="exclude-mainstream-toggle" className="text-sm text-white whitespace-nowrap">
                     Avoid Hits
@@ -439,7 +416,7 @@ export default function Alt7Page() {
                 <Button
                   onClick={() => handleSendMessage(mood)}
                   disabled={loading || (!mood.trim() && !selectedPersonaId)}
-                  className="px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl text-white font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-200 flex items-center gap-2 h-12 flex-shrink-0 w-full sm:w-auto"
+                  className="px-6 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl text-white font-medium hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 flex items-center gap-2 h-12 flex-shrink-0 w-full sm:w-auto"
                 >
                   {loading ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -468,24 +445,6 @@ export default function Alt7Page() {
                 filters={{...filters, excludeMainstream}}
                 selectedPersona={selectedPersona}
                 searchPerformed={searchPerformed}
-              />
-            </motion.div>
-          )}
-
-          {/* Quick Mood Buttons */}
-          {!searchPerformed && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="max-w-4xl mx-auto"
-            >
-              <MoodForm
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                onSelectMood={handleSelectMood}
-                isLoading={loading}
-                currentMood={mood}
               />
             </motion.div>
           )}
