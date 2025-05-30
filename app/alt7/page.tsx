@@ -102,7 +102,7 @@ export default function Alt7Page() {
         console.warn("Received unexpected data structure from findSongs:", result)
         throw new Error("Received unexpected data structure.")
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error calling findSongs:", err)
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred."
       setError(errorMessage)
@@ -268,7 +268,7 @@ export default function Alt7Page() {
                       </Avatar>
                       <div className="flex-1">
                         <h3 className="text-xl font-bold text-white mb-2">{persona.name}</h3>
-                        <p className="text-gray-300 mb-3">"{persona.description}"</p>
+                        <p className="text-gray-300 mb-3">&quot;{persona.description}&quot;</p>
                         <div className="flex flex-wrap gap-2">
                           {persona.artists.slice(0, 3).map((artist) => (
                             <span key={artist} className="text-xs bg-white/10 text-gray-300 px-2 py-1 rounded-full">
@@ -299,7 +299,7 @@ export default function Alt7Page() {
                       {getPersonaIcon(persona.name)}
                       <div className="flex-1">
                         <h3 className="text-lg font-bold text-white mb-1">{persona.name}</h3>
-                        <p className="text-gray-300 text-sm mb-2">{persona.description}</p>
+                        <p className="text-gray-300 text-sm mb-2">&quot;{persona.description}&quot;</p>
                         <div className="flex flex-wrap gap-1 mb-2">
                           {persona.artists.slice(0, 2).map((artist) => (
                             <span key={artist} className="text-xs bg-white/10 text-gray-300 px-2 py-1 rounded-full">
