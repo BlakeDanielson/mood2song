@@ -1,33 +1,33 @@
-'use client'
+"use client"
 
-import React, { useState, useEffect, useCallback } from 'react'
-import { motion } from 'framer-motion'
-import { IconUser, IconSparkles, IconSearch } from '@tabler/icons-react'
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Loader2, Laptop, Truck, Guitar, Music } from 'lucide-react'
-import { toast } from "sonner"
+import { useState, useCallback, useEffect } from "react"
+import { MoodForm } from "@/components/mood-form"
+import { SongRecommendations } from "@/components/song-recommendations"
 import { personas, Persona } from "@/lib/personas"
 import { findSongs } from "@/app/actions"
 import type { SongData, FindSongsSuccessResponse } from "@/app/actions"
-import { SongRecommendations } from "@/components/song-recommendations"
+import { toast } from "sonner"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Laptop, Truck, Guitar, Music, Info } from 'lucide-react'
+import { Badge } from "@/components/ui/badge"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
+import { Loader2, Sparkles, Search } from "lucide-react"
 import { PersonaModal } from "@/components/persona-modal"
-import { Alt7Sidebar, Alt7SidebarToggle } from "./components/alt7-sidebar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-const moodWords = ["happy", "energetic", "chill", "romantic", "melancholic", "upbeat"]
-
-// Helper to get an icon based on persona name
+// Helper to get an icon based on persona name (replace with better logic if needed)
 const getPersonaIcon = (personaName: string): JSX.Element => {
-  if (personaName.includes("Online")) return <Laptop className="h-4 w-4 text-purple-400" />;
-  if (personaName.includes("Country")) return <Truck className="h-4 w-4 text-purple-400" />;
-  if (personaName.includes("Rock")) return <Guitar className="h-4 w-4 text-purple-400" />;
-  return <Music className="h-4 w-4 text-purple-400" />;
+  if (personaName.includes("Online")) return <Laptop className="h-6 w-6 text-green-500" />;
+  if (personaName.includes("Country")) return <Truck className="h-6 w-6 text-green-500" />;
+  if (personaName.includes("Rock")) return <Guitar className="h-6 w-6 text-green-500" />;
+  // Add more specific icons as needed
+  return <Music className="h-6 w-6 text-green-500" />; // Default icon
 };
 
 export default function Alt7Page() {
-  // Main page state - complete feature parity
   const [selectedPersonaId, setSelectedPersonaId] = useState<string | null>(null)
   const [selectedPersonaForModal, setSelectedPersonaForModal] = useState<Persona | null>(null)
   const [songs, setSongs] = useState<SongData[]>([])
@@ -35,30 +35,18 @@ export default function Alt7Page() {
   const [error, setError] = useState<string | null>(null)
   const [lastFetchParams, setLastFetchParams] = useState<{ mood?: string, filters: any, personaId?: string | null } | null>(null)
   const [searchPerformed, setSearchPerformed] = useState(false)
+  const [showAllPersonas, setShowAllPersonas] = useState(false); // State to control visibility
 
   const [mood, setMood] = useState("")
+  const [displayedMood, setDisplayedMood] = useState("")
   const [excludeMainstream, setExcludeMainstream] = useState(false)
-  const [filters] = useState({
+  const [filters, setFilters] = useState({
     genre: "",
     era: "",
     popularity: "",
     language: "",
   })
 
-  // Alt7 specific state
-  const [currentMoodIndex, setCurrentMoodIndex] = useState(0)
-  const [showPersonas, setShowPersonas] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-
-  // Animate mood words
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentMoodIndex((prev: number) => (prev + 1) % moodWords.length)
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [])
-
-  // Main page functionality - complete feature parity
   const handleFindSongs = useCallback(async () => {
     const currentMood = mood.trim() || undefined;
     const currentFilters = { ...filters, excludeMainstream };
@@ -72,6 +60,7 @@ export default function Alt7Page() {
     }
 
     console.log("handleFindSongs fetching with:", { currentMood, currentPersonaId, currentFilters })
+    setDisplayedMood(currentMood || "")
     setLoading(true)
     setError(null)
     setSongs([])
@@ -115,6 +104,10 @@ export default function Alt7Page() {
     }
   }, [mood, filters, excludeMainstream, selectedPersonaId])
 
+  const handleButtonClick = () => {
+    handleFindSongs();
+  };
+
   const handlePersonaSelect = (id: string | null) => {
     const isDeselecting = selectedPersonaId === id;
     
@@ -143,6 +136,24 @@ export default function Alt7Page() {
     setSelectedPersonaForModal(null);
   };
 
+  const handleFilterChange = (newFilters: {
+    genre?: string
+    era?: string
+    popularity?: string
+    language?: string
+  }) => {
+    setFilters({
+      genre: newFilters.genre || "",
+      era: newFilters.era || "",
+      popularity: newFilters.popularity || "",
+      language: newFilters.language || "",
+    });
+  }
+
+  const handleSelectMood = (selectedMood: string) => {
+    setMood(selectedMood);
+  }
+
   const handleRefresh = () => {
       if (lastFetchParams) {
           console.log("Refreshing with last params:", lastFetchParams);
@@ -164,325 +175,199 @@ export default function Alt7Page() {
   const featuredPersonas = personas.filter(p => topPersonaIds.includes(p.id));
   const otherPersonas = personas.filter(p => !topPersonaIds.includes(p.id));
 
-  const handleSendMessage = async (content: string) => {
-    if (!content.trim()) return
-
-    setMood(content)
-    handleFindSongs()
-  }
-
-  const selectPersona = (persona: Persona) => {
-    handlePersonaSelect(persona.id)
-    setShowPersonas(false)
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-blue-900/20 to-black relative overflow-hidden">
-      {/* Custom CSS for floating animation */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes float {
-            0% { transform: translateX(0px) translateY(0px); }
-            33% { transform: translateX(30px) translateY(-30px); }
-            66% { transform: translateX(-20px) translateY(20px); }
-            100% { transform: translateX(0px) translateY(0px); }
-          }
-          .animate-float {
-            animation: float linear infinite;
-          }
-        `
-      }} />
-      
-      {/* Sidebar Components */}
-      <Alt7SidebarToggle onClick={() => setSidebarOpen(true)} />
-      <Alt7Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black"></div>
-        {/* Floating particles */}
-        {Array.from({ length: 50 }).map((_, i) => {
-          const randomX = Math.random() * 100;
-          const randomY = Math.random() * 100;
-          const animationDuration = 20 + Math.random() * 40; // 20-60 seconds
-          const animationDelay = Math.random() * 20; // 0-20 seconds delay
-          const opacity = Math.random() * 0.8 + 0.2;
-          
-          return (
-            <div
-              key={i}
-              className="absolute animate-pulse"
-              style={{
-                left: `${randomX}%`,
-                top: `${randomY}%`,
-                animationDelay: `${animationDelay}s`,
-                animationDuration: `${2 + Math.random() * 2}s`,
-              }}
-            >
-              <div
-                className="w-1 h-1 rounded-full bg-white animate-float"
-                style={{
-                  opacity: opacity,
-                  animationDuration: `${animationDuration}s`,
-                  animationDelay: `${animationDelay}s`,
-                }}
-              />
-            </div>
-          );
-        })}
+    <div className="mx-auto py-4 space-y-10">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-[#1ED760] to-[#1DB954] bg-clip-text text-transparent">
+          Discover Music by Mood, Persona, or Both
+        </h1>
+        <p className="text-muted-foreground">Tell us how you're feeling, apply filters, or pick a persona vibe below.</p>
       </div>
 
-      {/* Persona Selection Modal */}
-      {showPersonas && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={() => setShowPersonas(false)}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+        <div className="relative flex-grow">
+          <Textarea
+            id="mood-input"
+            placeholder={"Describe your mood, activity or anything else! (e.g., 'Chill beats for a rainy afternoon', 'Upbeat running mix', 'Cooking dinner soundtrack', 'Help me roast my friend Scott')\nSet filters, or select a persona below!\nPress Enter to find songs or Shift+Enter to add a new line"}
+            value={mood}
+            onChange={(e) => setMood(e.target.value)}
+            maxLength={250}
+            className="spotify-input pl-3 pr-3 py-3 h-24 rounded-lg text-sm w-full resize-none"
+            disabled={loading}
+            onKeyDown={(e) => { 
+              if (e.key === 'Enter' && !e.shiftKey) { 
+                e.preventDefault();
+                handleFindSongs(); 
+              }
+            }}
+          />
+        </div>
+        <div className="flex items-center space-x-2 flex-shrink-0 self-center sm:self-auto">
+          <Switch
+            id="exclude-mainstream-toggle"
+            checked={excludeMainstream}
+            onCheckedChange={setExcludeMainstream}
+            className="data-[state=checked]:bg-[#1DB954]"
+            disabled={loading}
+          />
+          <Label htmlFor="exclude-mainstream-toggle" className="text-sm text-white whitespace-nowrap">
+            Avoid Hits
+          </Label>
+        </div>
+        <Button
+          type="button"
+          onClick={handleButtonClick}
+          disabled={loading || (!mood && !selectedPersonaId)}
+          className="spotify-button rounded-full px-16 py-3 h-12 flex-shrink-0 w-full sm:w-auto"
         >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-black/80 backdrop-blur-md border border-white/20 rounded-2xl p-8 max-w-6xl w-full max-h-[80vh] overflow-y-auto"
-            onClick={(e: React.MouseEvent) => e.stopPropagation()}
-          >
-            <h2 className="text-3xl font-bold text-white mb-2 text-center">Choose Your AI Music Persona</h2>
-            <p className="text-gray-300 text-center mb-8">Each persona has unique music knowledge and personality</p>
-            
-            {/* Featured Personas */}
-            <div className="mb-8">
-              <h3 className="text-xl font-bold text-white mb-4">Featured Personas</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                {featuredPersonas.map((persona) => (
-                  <motion.button
-                    key={persona.id}
-                    onClick={() => selectPersona(persona)}
-                    className={`text-left p-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl hover:bg-white/20 transition-all group ${selectedPersonaId === persona.id ? 'ring-2 ring-blue-500' : ''}`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="flex items-start gap-4">
-                      <Avatar className="h-16 w-16 border-2 border-green-500">
-                        <AvatarImage src={persona.imageUrl} alt={`${persona.name} avatar`} />
-                        <AvatarFallback className="bg-[#333]">{persona.name.substring(0, 2)}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-white mb-2">{persona.name}</h3>
-                        <p className="text-gray-300 mb-3">&quot;{persona.description}&quot;</p>
-                        <div className="flex flex-wrap gap-2">
-                          {persona.artists.slice(0, 3).map((artist) => (
-                            <span key={artist} className="text-xs bg-white/10 text-gray-300 px-2 py-1 rounded-full">
-                              {artist}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.button>
-                ))}
-              </div>
-            </div>
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Finding...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Find Songs
+            </>
+          )}
+        </Button>
+      </div>
 
-            {/* All Other Personas */}
-            <div>
-              <h3 className="text-xl font-bold text-white mb-4">All Personas</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {otherPersonas.map((persona) => (
-                  <motion.button
-                    key={persona.id}
-                    onClick={() => selectPersona(persona)}
-                    className={`text-left p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl hover:bg-white/20 transition-all group ${selectedPersonaId === persona.id ? 'ring-2 ring-blue-500' : ''}`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="flex items-start gap-3">
-                      {getPersonaIcon(persona.name)}
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-white mb-1">{persona.name}</h3>
-                        <p className="text-gray-300 text-sm mb-2">&quot;{persona.description}&quot;</p>
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {persona.artists.slice(0, 2).map((artist) => (
-                            <span key={artist} className="text-xs bg-white/10 text-gray-300 px-2 py-1 rounded-full">
-                              {artist}
-                            </span>
-                          ))}
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleOpenPersonaModal(persona)
-                          }}
-                          className="text-xs text-blue-400 hover:text-blue-300 p-0 h-auto"
-                        >
-                          Learn more →
-                        </Button>
-                      </div>
-                    </div>
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-            
-            <div className="flex justify-center mt-8">
-              <button
-                onClick={() => setShowPersonas(false)}
-                className="px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white hover:bg-white/20 transition-all"
-              >
-                Close
-              </button>
-            </div>
-          </motion.div>
-        </motion.div>
+      {/* Moved SongRecommendations to be above Tabs, but below input */}
+      {searchPerformed && (
+        <div className="mb-6"> { /* Add margin below recommendations */}
+          <SongRecommendations
+            songs={songs}
+            loading={loading}
+            error={error}
+            mood={displayedMood}
+            filters={{...filters, excludeMainstream}}
+            selectedPersona={selectedPersona}
+            onRefresh={handleRefresh}
+            searchPerformed={searchPerformed} // Pass searchPerformed to handle internal messages correctly
+          />
+        </div>
       )}
 
-      {/* Main Content */}
-      <div className="relative z-10 pt-16 pb-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Hero Section */}
-          <div className="relative z-20 text-center mb-16">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="mb-8"
+      {/* Mood Form Content (Presets & Filters) - No longer in a Tab */}
+      <MoodForm
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onSelectMood={handleSelectMood}
+        isLoading={loading}
+        currentMood={mood}
+        // Removed onSelectPersonaAndSwitchTab prop
+      />
+      
+      {/* Featured Personas Section */}
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold text-center text-white">Top Personas</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {featuredPersonas.map((persona) => (
+            <Card
+              key={persona.id}
+              className={`cursor-pointer transition-all duration-200 ease-in-out bg-[#181818] border-[#282828] text-white hover:bg-[#282828] flex flex-col ${selectedPersonaId === persona.id ? 'ring-2 ring-green-500' : ''}`}
+              onClick={() => handlePersonaSelect(persona.id)}
             >
-              <h1 className="text-6xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-500 to-blue-600 mb-6">
-                MoodTune
-              </h1>
-              <div className="text-2xl md:text-4xl text-white font-light">
-                Discover music that matches your{' '}
-                <motion.span
-                  key={currentMoodIndex}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="text-blue-400 font-medium"
-                >
-                  {moodWords[currentMoodIndex]}
-                </motion.span>
-              </div>
-            </motion.div>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-lg md:text-xl text-gray-300 max-w-4xl mx-auto mb-12"
-            >
-              AI-powered music discovery with personalized personas that understand your emotions and find the perfect soundtrack for every moment.
-            </motion.p>
-
-            {/* Control Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="flex flex-wrap justify-center gap-4 mb-8"
-            >
-              <button
-                onClick={() => setShowPersonas(true)}
-                className="flex items-center gap-2 px-6 py-3 rounded-full transition-all bg-white/10 backdrop-blur-md border border-white/20 text-gray-300 hover:bg-white/20"
-              >
-                <IconUser className="h-5 w-5" />
-                Choose AI Persona
-                {selectedPersona && <IconSparkles className="h-4 w-4" />}
-              </button>
-            </motion.div>
-
-            {/* Selected Persona Display */}
-            {selectedPersona && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-8"
-              >
-                <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 backdrop-blur-md border border-blue-500/30 rounded-2xl">
-                  <Avatar className="h-8 w-8 border-2 border-blue-400">
-                    <AvatarImage src={selectedPersona.imageUrl} alt={`${selectedPersona.name} avatar`} />
-                    <AvatarFallback className="bg-blue-600 text-white text-sm">{selectedPersona.name.substring(0, 2)}</AvatarFallback>
-                  </Avatar>
-                  <span className="text-white font-medium">{selectedPersona.name}</span>
-                  <IconSparkles className="h-5 w-5" />
+              <CardHeader className="flex flex-row items-center gap-4 p-4">
+                <Avatar className="h-16 w-16 border-2 border-green-500">
+                  <AvatarImage src={persona.imageUrl} alt={`${persona.name} avatar`} />
+                  <AvatarFallback className="bg-[#333]">{persona.name.substring(0, 2)}</AvatarFallback>
+                </Avatar>
+                <div className="space-y-1">
+                  <CardTitle className="text-lg font-bold">{persona.name}</CardTitle>
+                  <CardDescription className="text-sm text-muted-foreground leading-snug">
+                    &quot;{persona.description}&quot;
+                  </CardDescription>
                 </div>
-              </motion.div>
-            )}
-
-            {/* Search Input */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="max-w-2xl mx-auto mb-16"
-            >
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                <div className="relative flex-grow">
-                  <textarea
-                    className="w-full px-6 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg h-24 resize-none"
-                    placeholder="Tell me how you're feeling or what you're doing..."
-                    value={mood}
-                    onChange={(e) => setMood(e.target.value)}
-                    maxLength={250}
-                    disabled={loading}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault()
-                        handleSendMessage(mood)
-                      }
-                    }}
-                  />
+              </CardHeader>
+              <CardContent className="p-4 pt-2 space-y-4">
+                 <div>
+                  <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Key Artists</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {persona.artists.map(artist => (
+                       <Badge key={artist} variant="secondary" className="text-[10px] font-normal px-1.5 py-0.5 bg-[#555] text-gray-200 rounded-full whitespace-nowrap">{artist}</Badge>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2 flex-shrink-0 self-center sm:self-auto">
-                  <Switch
-                    id="exclude-mainstream-toggle"
-                    checked={excludeMainstream}
-                    onCheckedChange={setExcludeMainstream}
-                    className="data-[state=checked]:bg-blue-500"
-                  />
-                  <Label htmlFor="exclude-mainstream-toggle" className="text-sm text-white whitespace-nowrap">
-                    Avoid Hits
-                  </Label>
+                <div>
+                  <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Moods</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {persona.moods.map(mood => (
+                       <Badge key={mood} variant="outline" className="text-[10px] font-normal px-1.5 py-0.5 border-green-500 text-green-400 rounded-full whitespace-nowrap">{mood}</Badge>
+                    ))}
+                  </div>
                 </div>
-                <Button
-                  onClick={() => handleSendMessage(mood)}
-                  disabled={loading || (!mood.trim() && !selectedPersonaId)}
-                  className="px-6 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl text-white font-medium hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 flex items-center gap-2 h-12 flex-shrink-0 w-full sm:w-auto"
-                >
-                  {loading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <IconSearch className="h-5 w-5" />
-                  )}
-                  Discover
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Song Recommendations using the main page component */}
-          {searchPerformed && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="max-w-6xl mx-auto mb-16"
-            >
-              <SongRecommendations
-                songs={songs}
-                loading={loading}
-                error={error}
-                onRefresh={handleRefresh}
-                mood={mood}
-                filters={{...filters, excludeMainstream}}
-                selectedPersona={selectedPersona}
-                searchPerformed={searchPerformed}
-              />
-            </motion.div>
-          )}
+                <div>
+                  <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Traits</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {persona.traits.map(trait => (
+                       <Badge key={trait} variant="secondary" className="text-[10px] font-normal px-1.5 py-0.5 bg-[#333] text-gray-300 rounded-full whitespace-nowrap">{trait}</Badge>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        {/* Button to toggle all personas */}
+        <div className="text-center mt-6">
+          <Button
+            variant="outline"
+            onClick={() => setShowAllPersonas(!showAllPersonas)} // Toggle state
+            className="spotify-outline-button"
+          >
+            {showAllPersonas ? "Hide Personas" : "See All Personas"} {/* Dynamic text */}
+          </Button>
         </div>
       </div>
+      
+      {/* Persona Grid - Conditionally rendered */}
+      {showAllPersonas && (
+        <div className="pt-6 border-t border-[#282828]">
+          <h2 className="text-2xl font-bold mb-4 text-center text-white">Choose a Persona Vibe</h2>
+           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {otherPersonas.map((persona) => (
+                <Card
+                  key={persona.id}
+                  className={`cursor-pointer transition-all duration-200 ease-in-out bg-[#181818] border-[#282828] text-white hover:bg-[#282828] flex flex-col justify-between ${selectedPersonaId === persona.id ? 'ring-2 ring-green-500' : ''}`}
+                  onClick={() => handlePersonaSelect(persona.id)}
+                >
+                  <CardHeader className="p-3 space-y-1.5">
+                    <div className="flex flex-row items-center gap-3">
+                      {getPersonaIcon(persona.name)}
+                      <CardTitle className="text-sm font-bold">{persona.name}</CardTitle>
+                    </div>
+                    <CardDescription className="text-xs text-muted-foreground leading-tight line-clamp-2">
+                      {persona.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-3 pt-1 flex items-center justify-between">
+                    <div className="flex flex-wrap gap-1 flex-grow mr-2">
+                      {persona.artists.slice(0, 3).map(artist => (
+                        <Badge key={artist} variant="secondary" className="text-[10px] font-normal px-1.5 py-0.5 bg-[#333] text-gray-300 rounded-full whitespace-nowrap">{artist}</Badge>
+                      ))}
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-xs text-muted-foreground hover:text-white hover:bg-[#282828] px-1.5 py-0.5 h-auto flex-shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenPersonaModal(persona);
+                      }}
+                      title={`More info about ${persona.name}`}
+                    >
+                      <Info className="h-3 w-3 mr-1" /> Info
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+      )}
 
-      {/* PersonaModal integration */}
       <PersonaModal 
         persona={selectedPersonaForModal} 
         isOpen={!!selectedPersonaForModal} 
@@ -490,29 +375,6 @@ export default function Alt7Page() {
         onSelectPersona={handlePersonaSelect}
         selectedPersonaId={selectedPersonaId}
       />
-
-      {/* Buy Me a Coffee Button */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 1 }}
-        className="fixed bottom-6 right-6 z-40"
-      >
-        <a
-          href="https://buymeacoffee.com/blvke"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 backdrop-blur-md border border-white/20 group"
-        >
-          <motion.div
-            whileHover={{ rotate: 15 }}
-            transition={{ duration: 0.2 }}
-          >
-            ☕
-          </motion.div>
-          <span className="font-medium text-sm">Buy me a coffee</span>
-        </a>
-      </motion.div>
     </div>
   )
 } 
