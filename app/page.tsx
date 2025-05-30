@@ -352,7 +352,7 @@ export default function Home() {
               className="mb-8"
             >
               <h1 className="text-6xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-500 to-blue-600 mb-6">
-                MoodTune
+                Mood2Song
               </h1>
               <div className="text-2xl md:text-4xl text-white font-light">
                 Discover music that matches your{' '}

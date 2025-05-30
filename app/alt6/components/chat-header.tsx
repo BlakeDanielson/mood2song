@@ -30,7 +30,7 @@ export function ChatHeader() {
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                MoodTune AI
+                Mood2Song AI
               </h1>
               <Badge className="bg-green-100 text-green-700 text-xs px-2 py-1">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>

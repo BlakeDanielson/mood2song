@@ -9,7 +9,7 @@ import {
   GitBranch, 
   Github, 
   Briefcase, 
-  Rocket, 
+  Coffee,
   Library, 
   X,
   Menu
@@ -69,10 +69,7 @@ export function MainSidebar({ isOpen, onClose }: MainSidebarProps) {
 
         {/* Navigation */}
         <nav className="flex-1 p-6 space-y-3">
-          <div className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-4">
-            Navigation
-          </div>
-          
+          {/* Alternative Design */}
           <Link 
             href="/alt7" 
             className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all group"
@@ -84,8 +81,9 @@ export function MainSidebar({ isOpen, onClose }: MainSidebarProps) {
             </span>
           </Link>
 
+          {/* About Section */}
           <div className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-4 mt-8">
-            About Blake
+            About
           </div>
 
           <Link 
@@ -96,7 +94,7 @@ export function MainSidebar({ isOpen, onClose }: MainSidebarProps) {
           >
             <Smile className="h-5 w-5 text-blue-400 group-hover:text-cyan-400 transition-colors" />
             <span className="font-medium text-white group-hover:text-cyan-400 transition-colors">
-              Hi! I&apos;m Blake
+              Hi, I&apos;m Blake
             </span>
           </Link>
 
@@ -108,12 +106,13 @@ export function MainSidebar({ isOpen, onClose }: MainSidebarProps) {
           >
             <Briefcase className="h-5 w-5 text-blue-400 group-hover:text-cyan-400 transition-colors" />
             <span className="font-medium text-white group-hover:text-cyan-400 transition-colors">
-              Try and recruit me
+              Try and hire me
             </span>
           </Link>
 
+          {/* Project Links Section */}
           <div className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-4 mt-8">
-            Projects
+            Project Links
           </div>
 
           <Link 
@@ -140,17 +139,10 @@ export function MainSidebar({ isOpen, onClose }: MainSidebarProps) {
             </span>
           </Link>
 
-          <Link 
-            href="https://jumpscare.pro" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all group"
-          >
-            <Rocket className="h-5 w-5 text-blue-400 group-hover:text-cyan-400 transition-colors" />
-            <span className="font-medium text-white group-hover:text-cyan-400 transition-colors">
-              Jumpscare Generator
-            </span>
-          </Link>
+          {/* Support Me Section */}
+          <div className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-4 mt-8">
+            Support me
+          </div>
 
           <Link 
             href="https://www.beatstars.com/BLVKE" 
@@ -163,16 +155,19 @@ export function MainSidebar({ isOpen, onClose }: MainSidebarProps) {
               Buy My Beats
             </span>
           </Link>
-        </nav>
 
-        {/* Footer */}
-        <div className="p-6 border-t border-white/10">
-          <div className="text-xs text-gray-400 space-y-2">
-            <p className="hover:text-blue-400 cursor-pointer transition-colors">Cookies</p>
-            <p className="hover:text-blue-400 cursor-pointer transition-colors">Privacy</p>
-            <p className="hover:text-blue-400 cursor-pointer transition-colors">Terms</p>
-          </div>
-        </div>
+          <Link 
+            href="https://buymeacoffee.com/blvke" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all group"
+          >
+            <Coffee className="h-5 w-5 text-blue-400 group-hover:text-cyan-400 transition-colors" />
+            <span className="font-medium text-white group-hover:text-cyan-400 transition-colors">
+              Buy me a coffee
+            </span>
+          </Link>
+        </nav>
       </motion.aside>
     </>
   )

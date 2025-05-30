@@ -182,7 +182,7 @@ export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
             </div>
           </div>
           <p className="text-xs text-gray-400">
-            {disabled ? "Reconnecting to provide you with the best music recommendations..." : "MoodTune AI understands your emotions and musical preferences to create the perfect soundtrack for any moment."}
+            {disabled ? "Reconnecting to provide you with the best music recommendations..." : "Mood2Song AI understands your emotions and musical preferences to create the perfect soundtrack for any moment."}
           </p>
         </div>
       </div>

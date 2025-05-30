@@ -51,7 +51,7 @@ export function Alt7Sidebar({ isOpen, onClose }: Alt7SidebarProps) {
               </div>
               <div>
                 <span className="font-bold text-xl bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                  MoodTune
+                  Mood2Song
                 </span>
                 <div className="text-xs text-gray-400 font-medium">
                   (M2S for short!)

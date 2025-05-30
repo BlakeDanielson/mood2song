@@ -64,7 +64,7 @@ export default function Alt6Page() {
     {
       id: '1',
       type: 'assistant',
-      content: "Hey there! 🎵 I'm MoodTune AI, your personal music companion! I'm here to help you discover amazing songs that perfectly match your mood, vibe, or any specific moment you're experiencing.\n\nWhether you're feeling happy, sad, energetic, or just need something to vibe to - I've got you covered with personalized recommendations from over 10 million tracks! ✨\n\nWhat kind of musical journey shall we embark on today?",
+      content: "Hey there! 🎵 I'm Mood2Song AI, your personal music companion! I'm here to help you discover amazing songs that perfectly match your mood, vibe, or any specific moment you're experiencing.\n\nWhether you're feeling happy, sad, energetic, or just need something to vibe to - I've got you covered with personalized recommendations from over 10 million tracks! ✨\n\nWhat kind of musical journey shall we embark on today?",
       timestamp: new Date()
     }
   ])
