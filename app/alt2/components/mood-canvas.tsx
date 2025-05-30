@@ -38,7 +38,7 @@ export function MoodCanvas({ onMoodChange, selectedMood }: MoodCanvasProps) {
     const data = imageData.data
     
     let totalPixels = 0
-    let colorCounts: { [key: string]: number } = {}
+    const colorCounts: { [key: string]: number } = {}
     
     // Analyze the canvas for color distribution
     for (let i = 0; i < data.length; i += 4) {

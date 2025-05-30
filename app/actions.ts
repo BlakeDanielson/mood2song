@@ -195,8 +195,8 @@ export async function findSongs({
   
   let prompt = "";
   let selectedPersona: Persona | null = null;
-  let currentMood = sanitizeUserInput(mood) || ""; // Sanitize mood input
-  let finalFilters = { ...options }; // Use provided options
+  const currentMood = sanitizeUserInput(mood) || ""; // Sanitize mood input
+  const finalFilters = { ...options }; // Use provided options
   
   // Sanitize filter options
   if (finalFilters.genre) finalFilters.genre = sanitizeUserInput(finalFilters.genre);
@@ -432,14 +432,14 @@ export async function findSongs({
         const spotifyData = await searchTracks(query, 1); // Fetch only the top track match
         const track = spotifyData?.tracks?.items?.[0];
 
-        let spotifyUrl = track?.external_urls?.spotify;
-        let artistSpotifyUrl = track?.artists?.[0]?.external_urls?.spotify; // <-- Get artist URL
-        let albumArt = track?.album?.images?.[0]?.url; // Use largest image
-        let embedUrl = spotifyUrl ? `https://open.spotify.com/embed/track/${track.id}` : undefined;
-        let previewUrl = track?.preview_url;
-        let popularity = track?.popularity;
-        let releaseDate = track?.album?.release_date;
-        let album = track?.album?.name;
+        const spotifyUrl = track?.external_urls?.spotify;
+        const artistSpotifyUrl = track?.artists?.[0]?.external_urls?.spotify; // <-- Get artist URL
+        const albumArt = track?.album?.images?.[0]?.url; // Use largest image
+        const embedUrl = spotifyUrl ? `https://open.spotify.com/embed/track/${track.id}` : undefined;
+        const previewUrl = track?.preview_url;
+        const popularity = track?.popularity;
+        const releaseDate = track?.album?.release_date;
+        const album = track?.album?.name;
 
         return {
           ...song,

@@ -14,6 +14,7 @@ import { findSongs } from "@/app/actions"
 import type { SongData, FindSongsSuccessResponse } from "@/app/actions"
 import { SongRecommendations } from "@/components/song-recommendations"
 import { PersonaModal } from "@/components/persona-modal"
+import { Alt7Sidebar, Alt7SidebarToggle } from "./components/alt7-sidebar"
 
 const moodWords = ["happy", "energetic", "chill", "romantic", "melancholic", "upbeat"]
 
@@ -47,6 +48,7 @@ export default function Alt7Page() {
   // Alt7 specific state
   const [currentMoodIndex, setCurrentMoodIndex] = useState(0)
   const [showPersonas, setShowPersonas] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Animate mood words
   useEffect(() => {
@@ -190,6 +192,10 @@ export default function Alt7Page() {
           }
         `
       }} />
+      
+      {/* Sidebar Components */}
+      <Alt7SidebarToggle onClick={() => setSidebarOpen(true)} />
+      <Alt7Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
