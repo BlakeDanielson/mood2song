@@ -17,8 +17,9 @@ import { PersonaModal } from "@/components/persona-modal"
 import { MainSidebar, MainSidebarToggle } from "@/components/main-sidebar"
 import { BuyMeCoffeeButton } from "@/components/ui/buy-me-coffee"
 import { MoodFilters } from "@/components/mood-filters"
+import { ActionTiles } from "@/components/action-tiles"
 
-const moodWords = ["happy", "energetic", "chill", "romantic", "melancholic", "upbeat"]
+const moodWords = ["happy", "energetic", "chill", "romantic", "melancholic", "upbeat", "sad", "angry", "excited", "relaxed", "stressed", "anxious", "depressed", "lonely", "bored"]
 
 // Helper to get an icon based on persona name
 const getPersonaIcon = (personaName: string): JSX.Element => {
@@ -217,25 +218,27 @@ export default function Home() {
       }} />
       
       {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black"></div>
-        {/* Floating particles */}
-        {Array.from({ length: 50 }).map((_, i) => {
-          const randomX = Math.random() * 100;
-          const randomY = Math.random() * 100;
-          const animationDuration = 20 + Math.random() * 40; // 20-60 seconds
-          const animationDelay = Math.random() * 20; // 0-20 seconds delay
-          const opacity = Math.random() * 0.8 + 0.2;
+        {/* Floating particles - using useMemo to prevent re-renders */}
+        {Array.from({ length: 50 }, (_, i) => {
+          // Generate static values that won't change on re-renders
+          const randomX = (i * 7.3) % 100; // Deterministic but varied positioning
+          const randomY = (i * 11.7) % 100;
+          const animationDuration = 8 + (i % 12); // 8-20 seconds, deterministic
+          const animationDelay = (i * 2.3) % 10; // 0-10 seconds delay, deterministic
+          const opacity = 0.2 + ((i * 3.7) % 60) / 100; // 0.2-0.8 opacity, deterministic
           
           return (
             <div
-              key={i}
+              key={`star-${i}`}
               className="absolute animate-pulse"
               style={{
                 left: `${randomX}%`,
                 top: `${randomY}%`,
                 animationDelay: `${animationDelay}s`,
-                animationDuration: `${2 + Math.random() * 2}s`,
+                animationDuration: `${1 + (i % 2)}s`, // 1-2 seconds pulse
+                willChange: 'transform, opacity',
               }}
             >
               <div
@@ -244,6 +247,7 @@ export default function Home() {
                   opacity: opacity,
                   animationDuration: `${animationDuration}s`,
                   animationDelay: `${animationDelay}s`,
+                  willChange: 'transform',
                 }}
               />
             </div>
@@ -371,7 +375,7 @@ export default function Home() {
                 Mood2Song
               </h1>
               <div className="text-2xl md:text-4xl text-white font-light">
-                Discover music that matches your{' '}
+                Discover music when you're feeling {' '}
                 <motion.span
                   key={currentMoodIndex}
                   initial={{ opacity: 0, y: 20 }}
@@ -390,7 +394,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-lg md:text-xl text-gray-300 max-w-4xl mx-auto mb-12"
             >
-              AI-powered music discovery with personalized personas that understand your emotions and find the perfect soundtrack for every moment.
+              AI-powered music discovery to find the perfect playlist for your mood.
             </motion.p>
 
             {/* Control Buttons */}
@@ -492,6 +496,9 @@ export default function Home() {
               disabled={loading}
             />
           </motion.div>
+
+          {/* Sidebar Link Tiles */}
+          <ActionTiles />
 
           {/* Song Recommendations using the main page component */}
           {searchPerformed && (

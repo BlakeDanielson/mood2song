@@ -4,7 +4,6 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { 
   Music4, 
-  Palette, 
   Smile, 
   GitBranch, 
   Github, 
@@ -69,20 +68,8 @@ export function MainSidebar({ isOpen, onClose }: MainSidebarProps) {
 
         {/* Navigation */}
         <nav className="flex-1 p-6 space-y-3">
-          {/* Alternative Design */}
-          <Link 
-            href="/alt7" 
-            className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all group"
-            onClick={onClose}
-          >
-            <Palette className="h-5 w-5 text-blue-400 group-hover:text-cyan-400 transition-colors" />
-            <span className="font-medium text-white group-hover:text-cyan-400 transition-colors">
-              Alternative Design
-            </span>
-          </Link>
-
           {/* About Section */}
-          <div className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-4 mt-8">
+          <div className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-4">
             About
           </div>
 

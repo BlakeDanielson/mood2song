@@ -9,10 +9,10 @@ interface LayoutWrapperProps {
 
 export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const pathname = usePathname()
-  const isFullScreenRoute = pathname === "/alt7" || pathname === "/alt" || pathname === "/"
+  const isFullScreenRoute = pathname === "/"
 
   if (isFullScreenRoute) {
-    // Full-screen layout for alt, alt7, and main routes
+    // Full-screen layout for main route
     return (
       <main className="min-h-screen w-full">
         {children}

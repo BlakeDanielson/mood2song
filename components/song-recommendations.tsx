@@ -8,6 +8,7 @@ import type {
 import { ExternalLink, Info, Music2, Play, RefreshCw, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { personas, Persona } from "@/lib/personas"
+import { SocialShare } from "@/components/social-share"
 
 interface SongRecommendationsProps {
   songs: SongData[] | undefined
@@ -172,6 +173,13 @@ export function SongRecommendations({
               </Button>
             </div>
           </div>
+
+          {/* Social Share Component */}
+          <SocialShare 
+            songs={songs} 
+            mood={mood || (selectedPersona ? `${selectedPersona.name} vibes` : "music discovery")}
+            className="mb-6"
+          />
 
           {/* Add horizontal scroll wrapper for the table on small screens */}
           <div className="overflow-x-auto">
