@@ -37,7 +37,7 @@ export default function Alt7Page() {
 
   const [mood, setMood] = useState("")
   const [excludeMainstream, setExcludeMainstream] = useState(false)
-  const [filters, setFilters] = useState({
+  const [filters] = useState({
     genre: "",
     era: "",
     popularity: "",
@@ -176,29 +176,54 @@ export default function Alt7Page() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-blue-900/20 to-black relative overflow-hidden">
+      {/* Custom CSS for floating animation */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes float {
+            0% { transform: translateX(0px) translateY(0px); }
+            33% { transform: translateX(30px) translateY(-30px); }
+            66% { transform: translateX(-20px) translateY(20px); }
+            100% { transform: translateX(0px) translateY(0px); }
+          }
+          .animate-float {
+            animation: float linear infinite;
+          }
+        `
+      }} />
+      
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black"></div>
         {/* Floating particles */}
-        {Array.from({ length: 50 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 2}s`,
-            }}
-          >
+        {Array.from({ length: 50 }).map((_, i) => {
+          const randomX = Math.random() * 100;
+          const randomY = Math.random() * 100;
+          const animationDuration = 20 + Math.random() * 40; // 20-60 seconds
+          const animationDelay = Math.random() * 20; // 0-20 seconds delay
+          const opacity = Math.random() * 0.8 + 0.2;
+          
+          return (
             <div
-              className="w-1 h-1 rounded-full bg-white"
+              key={i}
+              className="absolute animate-pulse"
               style={{
-                opacity: Math.random() * 0.8 + 0.2,
+                left: `${randomX}%`,
+                top: `${randomY}%`,
+                animationDelay: `${animationDelay}s`,
+                animationDuration: `${2 + Math.random() * 2}s`,
               }}
-            />
-          </div>
-        ))}
+            >
+              <div
+                className="w-1 h-1 rounded-full bg-white animate-float"
+                style={{
+                  opacity: opacity,
+                  animationDuration: `${animationDuration}s`,
+                  animationDelay: `${animationDelay}s`,
+                }}
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Persona Selection Modal */}
