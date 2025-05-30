@@ -14,6 +14,7 @@ import { findSongs } from "@/app/actions"
 import type { SongData, FindSongsSuccessResponse } from "@/app/actions"
 import { SongRecommendations } from "@/components/song-recommendations"
 import { PersonaModal } from "@/components/persona-modal"
+import { MainSidebar, MainSidebarToggle } from "@/components/main-sidebar"
 
 const moodWords = ["happy", "energetic", "chill", "romantic", "melancholic", "upbeat"]
 
@@ -26,6 +27,9 @@ const getPersonaIcon = (personaName: string): JSX.Element => {
 };
 
 export default function Home() {
+  // Sidebar state
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
   // Main page state - complete feature parity
   const [selectedPersonaId, setSelectedPersonaId] = useState<string | null>(null)
   const [selectedPersonaForModal, setSelectedPersonaForModal] = useState<Persona | null>(null)
@@ -201,6 +205,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-blue-900/20 to-black relative overflow-hidden">
+      {/* Sidebar */}
+      <MainSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <MainSidebarToggle onClick={() => setSidebarOpen(true)} />
+
       {/* Custom CSS for floating animation */}
       <style dangerouslySetInnerHTML={{
         __html: `
