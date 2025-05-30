@@ -16,6 +16,7 @@ import { SongRecommendations } from "@/components/song-recommendations"
 import { PersonaModal } from "@/components/persona-modal"
 import { MainSidebar, MainSidebarToggle } from "@/components/main-sidebar"
 import { BuyMeCoffeeButton } from "@/components/ui/buy-me-coffee"
+import { MoodFilters } from "@/components/mood-filters"
 
 const moodWords = ["happy", "energetic", "chill", "romantic", "melancholic", "upbeat"]
 
@@ -42,7 +43,7 @@ export default function Home() {
 
   const [mood, setMood] = useState("")
   const [excludeMainstream, setExcludeMainstream] = useState(false)
-  const [filters] = useState({
+  const [filters, setFilters] = useState({
     genre: "",
     era: "",
     popularity: "",
@@ -60,6 +61,21 @@ export default function Home() {
     }, 3000)
     return () => clearInterval(interval)
   }, [])
+
+  // Filter change handler
+  const handleFilterChange = (newFilters: {
+    genre?: string
+    era?: string
+    popularity?: string
+    language?: string
+  }) => {
+    setFilters({
+      genre: newFilters.genre || "",
+      era: newFilters.era || "",
+      popularity: newFilters.popularity || "",
+      language: newFilters.language || "",
+    })
+  }
 
   // Main page functionality - complete feature parity
   const handleFindSongs = useCallback(async () => {
@@ -462,6 +478,20 @@ export default function Home() {
               </div>
             </motion.div>
           </div>
+
+          {/* Filter Options */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="max-w-6xl mx-auto mb-16"
+          >
+            <MoodFilters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              disabled={loading}
+            />
+          </motion.div>
 
           {/* Song Recommendations using the main page component */}
           {searchPerformed && (
