@@ -522,29 +522,6 @@ export default function AltPage() {
         onSelectPersona={handlePersonaSelect}
         selectedPersonaId={selectedPersonaId}
       />
-
-      {/* Buy Me a Coffee Button */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 1 }}
-        className="fixed bottom-6 right-6 z-40"
-      >
-        <a
-          href="https://buymeacoffee.com/blvke"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 backdrop-blur-md border border-cyan-500/30 group font-mono"
-        >
-          <motion.div
-            whileHover={{ rotate: 15 }}
-            transition={{ duration: 0.2 }}
-          >
-            ☕
-          </motion.div>
-          <span className="font-medium text-sm">Buy me a coffee</span>
-        </a>
-      </motion.div>
     </div>
   )
 } 

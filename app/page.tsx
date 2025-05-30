@@ -15,6 +15,7 @@ import type { SongData, FindSongsSuccessResponse } from "@/app/actions"
 import { SongRecommendations } from "@/components/song-recommendations"
 import { PersonaModal } from "@/components/persona-modal"
 import { MainSidebar, MainSidebarToggle } from "@/components/main-sidebar"
+import { BuyMeCoffeeButton } from "@/components/ui/buy-me-coffee"
 
 const moodWords = ["happy", "energetic", "chill", "romantic", "melancholic", "upbeat"]
 
@@ -59,31 +60,6 @@ export default function Home() {
     }, 3000)
     return () => clearInterval(interval)
   }, [])
-
-  // Load Buy Me a Coffee widget
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.setAttribute('data-name', 'BMC-Widget');
-    script.setAttribute('data-cfasync', 'false');
-    script.src = 'https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js';
-    script.setAttribute('data-id', 'blvke');
-    script.setAttribute('data-description', 'Support me on Buy me a coffee!');
-    script.setAttribute('data-message', '');
-    script.setAttribute('data-color', '#5F7FFF');
-    script.setAttribute('data-position', 'Right');
-    script.setAttribute('data-x_margin', '18');
-    script.setAttribute('data-y_margin', '18');
-    
-    document.head.appendChild(script);
-
-    return () => {
-      // Cleanup: remove script when component unmounts
-      const existingScript = document.querySelector('script[data-name="BMC-Widget"]');
-      if (existingScript) {
-        document.head.removeChild(existingScript);
-      }
-    };
-  }, []);
 
   // Main page functionality - complete feature parity
   const handleFindSongs = useCallback(async () => {
@@ -504,6 +480,25 @@ export default function Home() {
                 selectedPersona={selectedPersona}
                 searchPerformed={searchPerformed}
               />
+              
+              {/* Contextual Buy Me a Coffee Button */}
+              {songs.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="mt-12 text-center"
+                >
+                  <p className="text-gray-400 text-sm mb-4">
+                    Enjoying the music discoveries? Support the developer!
+                  </p>
+                  <BuyMeCoffeeButton 
+                    username={process.env.NEXT_PUBLIC_BUYMEACOFFEE_USERNAME || "blvke"} 
+                    text="Buy me a coffee ☕"
+                    className="mx-auto"
+                  />
+                </motion.div>
+              )}
             </motion.div>
           )}
         </div>

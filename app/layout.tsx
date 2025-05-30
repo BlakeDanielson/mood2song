@@ -7,6 +7,7 @@ import { SonnerProvider } from "@/components/sonner-provider"
 import { Analytics } from "@vercel/analytics/react"
 import Script from "next/script"
 import { LayoutWrapper } from "@/components/layout-wrapper"
+import { BuyMeCoffee } from "@/components/ui/buy-me-coffee"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -37,6 +38,17 @@ export default function RootLayout({
           <SonnerProvider />
         </ThemeProvider>
         <Analytics />
+        
+        {/* Global floating Buy Me a Coffee widget */}
+        <BuyMeCoffee 
+          username={process.env.NEXT_PUBLIC_BUYMEACOFFEE_USERNAME || "blvke"}
+          message="Thank you for using Mood2Song! If you enjoyed it, consider buying me a coffee! ☕"
+          description="Support the developer!"
+          color="#FFDD00"
+          position="right"
+          xMargin={18}
+          yMargin={18}
+        />
       </body>
     </html>
   )

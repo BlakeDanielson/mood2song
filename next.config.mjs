@@ -49,7 +49,7 @@ const nextConfig = {
 function generateCSP() {
   const policy = {
     'default-src': ["'self'"],
-    'script-src': ["'self'", "'unsafe-eval'", "'unsafe-inline'", "https://open.spotify.com"],
+    'script-src': ["'self'", "'unsafe-eval'", "'unsafe-inline'", "https://open.spotify.com", "https://cdnjs.buymeacoffee.com"],
     'style-src': ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
     'img-src': ["'self'", "data:", "https:", "blob:"],
     'font-src': ["'self'", "https://fonts.gstatic.com"],
@@ -58,7 +58,8 @@ function generateCSP() {
       "'self'",
       "https://accounts.spotify.com",
       "https://api.spotify.com",
-      "https://api.openai.com"
+      "https://api.openai.com",
+      "https://www.buymeacoffee.com"
     ],
     'media-src': ["'self'", "https:", "blob:"],
     'object-src': ["'none'"],

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Home, Search, Library, Plus, Heart, Music, Folder, Briefcase, Coffee, ThumbsUp, ThumbsUpIcon, Github, GitBranch, BadgeDollarSign, DollarSign, Music2, Music3, Music4, LibraryBig, LibrarySquare, Waves, LucideWaves, HandHelping, HandCoins, HandHeart, HandMetal, LucideHand, User, User2, Smile, Egg, Rocket, Palette } from "lucide-react"
+import { Home, Search, Library, Plus, Heart, Music, Folder, Briefcase, ThumbsUp, ThumbsUpIcon, Github, GitBranch, BadgeDollarSign, DollarSign, Music2, Music3, Music4, LibraryBig, LibrarySquare, Waves, LucideWaves, HandHelping, HandCoins, HandHeart, HandMetal, LucideHand, User, User2, Smile, Egg, Rocket, Palette } from "lucide-react"
 import { Profiler } from "react"
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar"
 import { AvatarFallback } from "./ui/avatar"
@@ -43,10 +43,6 @@ export function Sidebar() {
           <Link href="https://www.beatstars.com/BLVKE" className="flex items-center gap-3 text-muted-foreground hover:text-[#1DB954] transition-colors">
             <Library className="h-6 w-6" />
             <span className="font-semibold">Buy My Beats</span>
-          </Link>
-          <Link href="https://www.buymeacoffee.com/BLVKE" className="flex items-center gap-3 text-muted-foreground hover:text-[#1DB954] transition-colors">
-            <Coffee className="h-6 w-6 text-[#1DB954]" />
-            <span className="font-semibold">Buy Me A Coffee</span>
           </Link>
         </nav>
       </div>

@@ -11,7 +11,6 @@ import {
   Briefcase, 
   Rocket, 
   Library, 
-  Coffee,
   X,
   Menu
 } from "lucide-react"
@@ -162,18 +161,6 @@ export function Alt7Sidebar({ isOpen, onClose }: Alt7SidebarProps) {
             <Library className="h-5 w-5 text-blue-400 group-hover:text-cyan-400 transition-colors" />
             <span className="font-medium text-white group-hover:text-cyan-400 transition-colors">
               Buy My Beats
-            </span>
-          </Link>
-
-          <Link 
-            href="https://www.buymeacoffee.com/BLVKE" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-yellow-500/20 to-orange-500/20 hover:from-yellow-500/30 hover:to-orange-500/30 border border-yellow-500/30 transition-all group"
-          >
-            <Coffee className="h-5 w-5 text-yellow-400 group-hover:text-yellow-300 transition-colors" />
-            <span className="font-medium text-yellow-100 group-hover:text-yellow-50 transition-colors">
-              Buy Me A Coffee
             </span>
           </Link>
         </nav>

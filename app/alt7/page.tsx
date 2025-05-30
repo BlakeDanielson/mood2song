@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Loader2, Sparkles, Search } from "lucide-react"
 import { PersonaModal } from "@/components/persona-modal"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { BuyMeCoffeeButton } from "@/components/ui/buy-me-coffee"
 
 // Helper to get an icon based on persona name (replace with better logic if needed)
 const getPersonaIcon = (personaName: string): JSX.Element => {
@@ -247,6 +248,20 @@ export default function Alt7Page() {
             onRefresh={handleRefresh}
             searchPerformed={searchPerformed} // Pass searchPerformed to handle internal messages correctly
           />
+          
+          {/* Contextual Buy Me a Coffee Button */}
+          {songs.length > 0 && (
+            <div className="mt-12 text-center">
+              <p className="text-gray-400 text-sm mb-4">
+                Enjoying the music discoveries? Support the developer!
+              </p>
+              <BuyMeCoffeeButton 
+                username={process.env.NEXT_PUBLIC_BUYMEACOFFEE_USERNAME || "blvke"} 
+                text="Buy me a coffee ☕"
+                className="mx-auto"
+              />
+            </div>
+          )}
         </div>
       )}
 
