@@ -371,11 +371,11 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               className="mb-8"
             >
-              <h1 className="text-6xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-500 to-blue-600 mb-6">
+              <h1 className="text-6xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-500 to-blue-600 mb-6 leading-tight pb-2">
                 Mood2Song
               </h1>
               <div className="text-2xl md:text-4xl text-white font-light">
-                Discover music when you're feeling {' '}
+                Discover music when you&apos;re feeling {' '}
                 <motion.span
                   key={currentMoodIndex}
                   initial={{ opacity: 0, y: 20 }}
@@ -443,7 +443,7 @@ export default function Home() {
                 <div className="relative flex-grow">
                   <textarea
                     className="w-full px-6 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg h-24 resize-none"
-                    placeholder="Tell me how you're feeling or what you're doing..."
+                    placeholder="Tell me how you&apos;re feeling or what you&apos;re doing..."
                     value={mood}
                     onChange={(e) => setMood(e.target.value)}
                     maxLength={250}

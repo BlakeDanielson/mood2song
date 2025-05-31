@@ -121,17 +121,14 @@ export function ActionTiles() {
       transition={{ duration: 0.8, delay: 0.6 }}
       className="max-w-6xl mx-auto mb-16"
     >
-      <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold text-white mb-2">Quick Links</h3>
-        <p className="text-gray-400">Explore more projects and connect with the creator</p>
-      </div>
+      
       
       <div className="flex justify-center">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl">
           <ActionTile 
             icon={<UserPlus size={24} />}
             title="Try and recruit me"
-            subtitle="Looking for a PM? Let's talk about opportunities."
+            subtitle="Looking for a PM or CSO? I'm a great one."
             href="https://www.blakemakesthings.com/contact"
           />
           
