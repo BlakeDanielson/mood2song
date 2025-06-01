@@ -183,16 +183,16 @@ export function SongRecommendations({
 
           {/* Add horizontal scroll wrapper for the table on small screens */}
           <div className="overflow-x-auto">
-            <table className="w-full table-auto border-collapse text-sm mt-2 min-w-[600px] sm:min-w-full"> {/* Added min-width for scroll activation */}
+            <table className="w-full table-auto border-collapse text-sm mt-2"> {/* Removed min-width constraints */}
               <thead>
                 <tr className="border-b border-[#333333]">
-                  <th className="px-2 py-2 text-center font-medium text-muted-foreground w-2">#</th>
-                  <th className="px-2 py-2 text-center font-medium text-muted-foreground w-auto hidden sm:table-cell">YEAR</th>
-                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">TITLE</th>
-                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto">ARTIST</th>
+                  <th className="px-2 py-2 text-center font-medium text-muted-foreground w-8">#</th>
+                  <th className="px-2 py-2 text-center font-medium text-muted-foreground w-16 hidden sm:table-cell">YEAR</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-1/4">TITLE</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-1/6">ARTIST</th>
                   {/* Hide REASON column on small screens */}
-                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto hidden sm:table-cell">REASON</th>
-                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-auto hidden sm:table-cell">ALBUM</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-1/4 hidden sm:table-cell">REASON</th>
+                  <th className="px-2 py-2 text-left font-medium text-muted-foreground w-1/6 hidden sm:table-cell">ALBUM</th>
                 </tr>
               </thead>
               <tbody>
@@ -210,7 +210,7 @@ export function SongRecommendations({
                       <td className="px-2 py-2 text-muted-foreground text-sm text-center align-middle hidden sm:table-cell">
                         {song.year || "-"}
                       </td>
-                      <td className="px-2 py-2 align-middle max-w-xs">
+                      <td className="px-2 py-2 align-middle">
                         <div className="flex items-center gap-3">
                           {song.albumArt ? (
                             <img
@@ -223,46 +223,50 @@ export function SongRecommendations({
                               <Music2 className="h-5 w-5 text-muted-foreground" />
                             </div>
                           )}
-                          <div className="min-w-0">
+                          <div className="min-w-0 flex-1 max-w-[200px]">
                             {song.spotifyUrl ? (
                               <a 
                                 href={song.spotifyUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-white font-medium truncate group-hover:underline hover:text-[#1DB954] inline-block"
+                                className="text-white font-medium group-hover:underline hover:text-[#1DB954] inline-block break-words leading-tight"
                                 title={`Listen to ${song.title} on Spotify`}
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {song.title}
                               </a>
                             ) : (
-                              <div className="text-white font-medium truncate">{song.title}</div>
+                              <div className="text-white font-medium break-words leading-tight">{song.title}</div>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-2 py-2 align-middle text-sm truncate max-w-[12rem]">
+                      <td className="px-2 py-2 align-middle text-sm">
                         {song.artistSpotifyUrl ? (
                           <a 
                             href={song.artistSpotifyUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-muted-foreground group-hover:text-white group-hover:underline hover:!text-[#1DB954]"
+                            className="text-muted-foreground group-hover:text-white group-hover:underline hover:!text-[#1DB954] break-words"
                             title={`View ${song.artist} on Spotify`}
                             onClick={(e) => e.stopPropagation()}
                           >
                             {song.artist}
                           </a>
                         ) : (
-                           <div className="text-muted-foreground">{song.artist}</div>
+                           <div className="text-muted-foreground break-words">{song.artist}</div>
                         )}
                       </td>
                       {/* Hide REASON column data on small screens */}
-                      <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle hidden sm:table-cell">
-                        {song.reason || "-"}
+                      <td className="px-2 py-2 text-muted-foreground text-sm align-top hidden sm:table-cell">
+                        <div className="break-words whitespace-normal leading-relaxed max-w-[250px]">
+                          {song.reason || "-"}
+                        </div>
                       </td>
-                      <td className="px-2 py-2 text-muted-foreground text-sm truncate align-middle hidden sm:table-cell max-w-[12rem]">
-                        {song.album || "-"}
+                      <td className="px-2 py-2 text-muted-foreground text-sm align-middle hidden sm:table-cell">
+                        <div className="break-words">
+                          {song.album || "-"}
+                        </div>
                       </td>
                     </tr>
                     {expandedSong === (song.spotifyId || `${song.title}-${index}`) && (
