@@ -267,7 +267,7 @@ export function SongRecommendations({
                     </tr>
                     {expandedSong === (song.spotifyId || `${song.title}-${index}`) && (
                       <tr className="bg-[#282828]">
-                        <td colSpan={6} className="p-4">
+                        <td colSpan={3} className="p-4">
                           {song.embedUrl && (
                             <div className="mt-2">
                               <iframe
