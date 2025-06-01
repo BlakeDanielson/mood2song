@@ -497,9 +497,6 @@ export default function Home() {
             />
           </motion.div>
 
-          {/* Sidebar Link Tiles */}
-          <ActionTiles />
-
           {/* Song Recommendations using the main page component */}
           {searchPerformed && (
             <motion.div
@@ -538,6 +535,9 @@ export default function Home() {
               )}
             </motion.div>
           )}
+
+          {/* Sidebar Link Tiles */}
+          <ActionTiles />
         </div>
       </div>
 
