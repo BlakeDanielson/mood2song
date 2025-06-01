@@ -128,7 +128,7 @@ export function ActionTiles() {
           <ActionTile 
             icon={<UserPlus size={24} />}
             title="Try and recruit me"
-            subtitle="Looking for a PM or CSO? I'm a great one."
+            subtitle="Looking for a PM or CoS? I'm a great one."
             href="https://www.blakemakesthings.com/contact"
           />
           
